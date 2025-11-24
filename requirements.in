@@ -9,3 +9,6 @@ joblib
 matplotlib
 lightgbm
 seaborn
+plotly
+nbformat 
+ipywidgets

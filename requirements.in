@@ -12,3 +12,6 @@ seaborn
 plotly
 nbformat 
 ipywidgets
+scipy
+pytorch-tabnet
+transformers

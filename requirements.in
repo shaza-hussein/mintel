@@ -15,3 +15,5 @@ ipywidgets
 scipy
 pytorch-tabnet
 transformers
+catboost
+xgboost

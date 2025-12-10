@@ -1,9 +1,10 @@
 # This file contains the queries used to pull the datasets from the opreaotr Database.
 
 
-# --------------------------------------------
-# This represents the information for each bundle, from the bundle's perspective.
-# --------------------------------------------
+# -----------------------------------------------------------------------------------
+# These represents the information for each bundle, from the bundle's perspective.
+# Daily, Weekly, and Monthly.
+# ---------------------------------------------------------------------------------
 DAILY_BASE_BUNDLES_INFO: str = """--sql
 WITH daily_base_bundle_info AS ( -- daily base bundles information
 	SELECT tbl_dt, 
@@ -108,9 +109,12 @@ ORDER BY year_number, month_number
 
 
 
-
+# -----------------------------------------------------------------------------------
+# this query represents the daily data subscriptions for the subscribers. and it contains
+# the sites information that user purchase the bundles from, and also contain the most used device
+# information of the users in one month.
+# ---------------------------------------------------------------------------------
 COMPHERSIVE_DAILY_SUB_QUERY: str = """--sql
--- daily subscription for users with their info, and the most used mobile in the current month
 WITH d_filtered AS (
     SELECT
         tbl_dt, msisdn, bundle_id, bundle_name, bundle_type,

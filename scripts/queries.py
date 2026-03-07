@@ -54,7 +54,7 @@ WITH weekly_base_bundle_info AS ( -- weekly base bundles information
         SUM(coalesce(TRS,0)) AS total_sessions,
         COUNT(DISTINCT msisdn) AS unique_users
     FROM facts.fact_bundle_subscription 
-    WHERE tbl_dt BETWEEN 20250101 AND 20251030
+    WHERE tbl_dt BETWEEN 20240101 AND 20251231
         AND subscriptions != 0
         AND total_amount != 0
         AND bundle_name IS NOT NULL 

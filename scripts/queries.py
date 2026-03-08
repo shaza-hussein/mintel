@@ -193,3 +193,30 @@ LEFT JOIN most_used_device_by_month m
 LEFT JOIN facts.dim_location_cell_id_new l
  	ON d.cell_id = l.cell_id
 """
+
+
+# -----------------------------------------------------------------------------------
+# Qury to pull products dimensaion table (products profilea)
+# ---------------------------------------------------------------------------------
+DIM_PRODUCT_QUERY: str = """--sql
+    SELECT DISTINCT
+    s.bundle_id ,
+    d.bundle_name,
+    d.product_category,
+    d.category_description,
+    d.service_class_category, 
+    d.volume,
+    d.speed,
+    d.usage_type,
+    d.bundle_type,
+    d.business_categorisation,
+    d.price,
+    d.validity
+FROM facts.fact_bundle_subscription s
+LEFT JOIN dim.dim_bundle d
+    ON s.bundle_id =d.bundle_id
+WHERE s.tbl_dt =  CAST('{yesterday}' AS INTEGER)
+and s.bundle_id is not null 
+and s.bundle_name is not null
+and d.end_date >= '{end_date}'
+"""

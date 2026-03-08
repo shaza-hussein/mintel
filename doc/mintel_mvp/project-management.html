@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MinTel | Project Management</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <div class="container topbar">
+      <div class="brand">MinTel</div>
+      <nav>
+        <a href="index.html">Overview</a>
+        <a class="active" href="project-management.html">Project Management</a>
+        <a href="mvp-scope.html">MVP Build Plan</a>
+        <a href="dashboard-prototype.html">Dashboard Prototype</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div class="eyebrow">Execution Framework</div>
+      <h1>Project Management Plan</h1>
+      <p>This page defines governance, timeline, deliverables, ownership, and risk controls for delivering MinTel MVP in a structured and auditable way.</p>
+    </section>
+
+    <div class="grid">
+      <article class="card span-6">
+        <h2>Workstreams</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Workstream</th>
+              <th>Owner</th>
+              <th>Output</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Data & ETTL</td>
+              <td>Data Engineering</td>
+              <td>Reliable ingestion, features, retraining jobs</td>
+            </tr>
+            <tr>
+              <td>Product AI</td>
+              <td>ML Engineering</td>
+              <td>Bundle generation and pricing logic</td>
+            </tr>
+            <tr>
+              <td>Customer AI</td>
+              <td>Data Science</td>
+              <td>Profiles, segments, behavior models</td>
+            </tr>
+            <tr>
+              <td>Simulation & Recommendation</td>
+              <td>Applied AI</td>
+              <td>Outcome forecasts and targeting</td>
+            </tr>
+            <tr>
+              <td>Web Application</td>
+              <td>Full-Stack Team</td>
+              <td>Operator dashboard and analytics UI</td>
+            </tr>
+          </tbody>
+        </table>
+      </article>
+
+      <article class="card span-6">
+        <h2>Delivery Milestones</h2>
+        <ul>
+          <li><strong>M1 - Foundation:</strong> Data contracts, schema, baseline ETL, environment setup.</li>
+          <li><strong>M2 - Core Models:</strong> Initial product generation, pricing model, customer segmentation.</li>
+          <li><strong>M3 - Intelligent Matching:</strong> Recommendation service + simulation loop integrated.</li>
+          <li><strong>M4 - Dashboard MVP:</strong> Decision cockpit with KPI monitoring and drill-down pages.</li>
+          <li><strong>M5 - Validation:</strong> Scenario testing, model quality checks, stakeholder sign-off.</li>
+        </ul>
+      </article>
+
+      <article class="card span-4">
+        <h3>Governance</h3>
+        <ul>
+          <li>Weekly steering meeting</li>
+          <li>Daily engineering standup</li>
+          <li>Bi-weekly model review board</li>
+          <li>Change management log for assumptions</li>
+        </ul>
+      </article>
+
+      <article class="card span-4">
+        <h3>Key Risks</h3>
+        <ul>
+          <li>Data drift and feature instability</li>
+          <li>High simulation compute cost</li>
+          <li>Slow model retraining pipelines</li>
+          <li>Low adoption by business users</li>
+        </ul>
+      </article>
+
+      <article class="card span-4">
+        <h3>Mitigation Controls</h3>
+        <ul>
+          <li>Data quality gates and anomaly alerts</li>
+          <li>Model monitoring with rollback strategy</li>
+          <li>Batch + near-real-time serving design</li>
+          <li>UX walkthroughs with marketing team</li>
+        </ul>
+      </article>
+    </div>
+  </main>
+</body>
+</html>

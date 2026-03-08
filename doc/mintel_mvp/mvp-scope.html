@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MinTel | MVP Build Plan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <div class="container topbar">
+      <div class="brand">MinTel</div>
+      <nav>
+        <a href="index.html">Overview</a>
+        <a href="project-management.html">Project Management</a>
+        <a class="active" href="mvp-scope.html">MVP Build Plan</a>
+        <a href="dashboard-prototype.html">Dashboard Prototype</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div class="eyebrow">Delivery Backlog</div>
+      <h1>MVP Scope and Tasks</h1>
+      <p>The MVP focuses on minimum high-impact capabilities that prove business value: smarter bundle creation, better targeting, and pre-launch simulation confidence.</p>
+    </section>
+
+    <div class="grid">
+      <article class="card span-12">
+        <h2>MVP Must-Have Modules</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Module</th>
+              <th>Must Build in MVP</th>
+              <th>Definition of Done</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Data & ETTL</td>
+              <td>Ingestion, cleaning, feature pipeline, scheduled refresh</td>
+              <td>Daily automated pipeline with quality checks and logs</td>
+            </tr>
+            <tr>
+              <td>Product Generation</td>
+              <td>AI-assisted bundle generation with business constraints</td>
+              <td>Generate ranked candidate bundles from input goals</td>
+            </tr>
+            <tr>
+              <td>Dynamic Pricing</td>
+              <td>Price optimization model per product family</td>
+              <td>Output recommended price with confidence score</td>
+            </tr>
+            <tr>
+              <td>Customer Layer</td>
+              <td>Behavioral profiles and segment assignment</td>
+              <td>Queryable customer segments with explainable features</td>
+            </tr>
+            <tr>
+              <td>Recommendation Engine</td>
+              <td>Bundle-to-segment matching and ranking</td>
+              <td>Top-N recommendation list with expected uptake</td>
+            </tr>
+            <tr>
+              <td>Simulation Engine</td>
+              <td>Forecast adoption, activity, and revenue over time horizon</td>
+              <td>Scenario report for each proposed launch</td>
+            </tr>
+            <tr>
+              <td>Dashboard</td>
+              <td>Web app for operators with KPIs and scenario results</td>
+              <td>Interactive pages for monitoring and decision support</td>
+            </tr>
+          </tbody>
+        </table>
+      </article>
+
+      <article class="card span-6">
+        <h2>Engineering Task Breakdown</h2>
+        <ul>
+          <li>Define source schemas and SLA for ingestion feeds.</li>
+          <li>Implement feature store tables for product and customer signals.</li>
+          <li>Train baseline product and customer models with evaluation metrics.</li>
+          <li>Integrate recommendation matching between generated bundles and segments.</li>
+          <li>Implement simulation service and scenario API endpoints.</li>
+          <li>Build dashboard screens and connect to backend services.</li>
+          <li>Create model monitoring, data drift checks, and alerting.</li>
+        </ul>
+      </article>
+
+      <article class="card span-6">
+        <h2>MVP Non-Goals</h2>
+        <ul>
+          <li>Full autonomous launch without human approval gates.</li>
+          <li>Country-wide, multi-operator deployment at first release.</li>
+          <li>Real-time per-subscriber recommendation streaming at full scale.</li>
+          <li>Advanced multilingual chat assistant with full governance integration.</li>
+        </ul>
+      </article>
+
+      <article class="card span-12">
+        <h2>Success Metrics for MVP</h2>
+        <div class="grid" style="margin-top: 6px;">
+          <div class="span-4">
+            <p><strong>Bundle Design Speed</strong></p>
+            <div class="bar"><span style="width: 72%;"></span></div>
+            <p>Target: reduce cycle time by 50%+</p>
+          </div>
+          <div class="span-4">
+            <p><strong>Recommendation Precision</strong></p>
+            <div class="bar"><span style="width: 67%;"></span></div>
+            <p>Target: improve campaign CTR by 20%+</p>
+          </div>
+          <div class="span-4">
+            <p><strong>Forecast Reliability</strong></p>
+            <div class="bar"><span style="width: 75%;"></span></div>
+            <p>Target: simulation MAPE within accepted threshold</p>
+          </div>
+        </div>
+      </article>
+    </div>
+  </main>
+</body>
+</html>

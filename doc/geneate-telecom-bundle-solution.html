@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Telecom Bundle Generation System</title>
+  <style>
+    :root {
+      --bg: #f5f3ee;
+      --surface: rgba(255, 255, 255, 0.82);
+      --surface-strong: #ffffff;
+      --surface-soft: #efe9dd;
+      --text: #1f2933;
+      --muted: #5e6b75;
+      --line: rgba(31, 41, 51, 0.12);
+      --primary: #0f766e;
+      --primary-soft: rgba(15, 118, 110, 0.12);
+      --accent: #b45309;
+      --accent-soft: rgba(180, 83, 9, 0.12);
+      --danger: #b91c1c;
+      --shadow: 0 20px 45px rgba(44, 62, 80, 0.08);
+      --radius-lg: 28px;
+      --radius-md: 20px;
+      --radius-sm: 14px;
+      --max: 1180px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(15, 118, 110, 0.10), transparent 28%),
+        radial-gradient(circle at top right, rgba(180, 83, 9, 0.11), transparent 22%),
+        linear-gradient(180deg, #fbfaf7 0%, var(--bg) 100%);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page-shell {
+      width: min(var(--max), calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 64px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 36px;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(255, 250, 242, 0.88)),
+        var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -40px -50px auto;
+      width: 260px;
+      height: 260px;
+      background: radial-gradient(circle, rgba(15, 118, 110, 0.18), transparent 70%);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--surface-soft);
+      color: var(--primary);
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    h1, h2, h3, h4 {
+      margin: 0;
+      line-height: 1.1;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin-top: 18px;
+      font-size: clamp(2.3rem, 4vw, 4.7rem);
+      max-width: 12ch;
+    }
+
+    .hero p {
+      max-width: 70ch;
+      font-size: 1.05rem;
+      line-height: 1.8;
+      color: var(--muted);
+      margin: 18px 0 0;
+    }
+
+    .hero-grid,
+    .card-grid,
+    .metric-grid,
+    .stage-grid,
+    .name-grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .hero-grid {
+      grid-template-columns: 1.4fr 0.9fr;
+      margin-top: 28px;
+      align-items: start;
+    }
+
+    .glass,
+    .card,
+    .timeline-card,
+    .diagram,
+    .note,
+    .table-wrap {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .glass {
+      padding: 22px;
+    }
+
+    .glass h3 {
+      margin-bottom: 12px;
+      font-size: 1.05rem;
+    }
+
+    .pill-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .pill {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid var(--line);
+      font-size: 0.92rem;
+    }
+
+    .bullet-list {
+      margin: 14px 0 0;
+      padding-left: 20px;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .section {
+      margin-top: 34px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      background: rgba(255, 255, 255, 0.65);
+      box-shadow: var(--shadow);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 22px;
+    }
+
+    .section-index {
+      min-width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 1.05rem;
+    }
+
+    .card-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .metric-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      margin-top: 20px;
+    }
+
+    .stage-grid,
+    .name-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .card {
+      padding: 22px;
+    }
+
+    .card h3 {
+      font-size: 1.12rem;
+      margin-bottom: 10px;
+    }
+
+    .card p,
+    .metric p,
+    .timeline-card p,
+    .note p,
+    .label {
+      color: var(--muted);
+      line-height: 1.75;
+      margin: 0;
+    }
+
+    .metric {
+      padding: 18px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.78);
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 1.6rem;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .tag {
+      display: inline-flex;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .tag.accent {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .tag.danger {
+      background: rgba(185, 28, 28, 0.10);
+      color: var(--danger);
+    }
+
+    .diagram {
+      padding: 24px;
+      overflow-x: auto;
+    }
+
+    .flow {
+      display: grid;
+      gap: 18px;
+      min-width: 1020px;
+    }
+
+    .flow-row {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .flow-card {
+      position: relative;
+      padding: 18px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--line);
+      background: #fff;
+      min-height: 126px;
+    }
+
+    .flow-card strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 1rem;
+    }
+
+    .flow-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 0.95rem;
+    }
+
+    .arrow-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      align-items: center;
+      padding: 0 44px;
+    }
+
+    .arrow {
+      position: relative;
+      height: 28px;
+    }
+
+    .arrow::before {
+      content: "";
+      position: absolute;
+      inset: 50% 14px auto 0;
+      height: 2px;
+      background: linear-gradient(90deg, rgba(15, 118, 110, 0.22), var(--primary));
+      transform: translateY(-50%);
+    }
+
+    .arrow::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      top: 50%;
+      width: 10px;
+      height: 10px;
+      border-top: 2px solid var(--primary);
+      border-right: 2px solid var(--primary);
+      transform: translateY(-50%) rotate(45deg);
+    }
+
+    .timeline {
+      display: grid;
+      gap: 14px;
+    }
+
+    .timeline-card {
+      padding: 18px 20px;
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .timeline-step {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .note {
+      padding: 22px;
+      margin-top: 18px;
+    }
+
+    .note strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 1rem;
+    }
+
+    .table-wrap {
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface-strong);
+    }
+
+    th,
+    td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+      font-size: 0.95rem;
+    }
+
+    th {
+      background: #faf8f3;
+      font-size: 0.83rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    code {
+      font-family: "Courier New", Courier, monospace;
+      font-size: 0.93em;
+      background: rgba(15, 118, 110, 0.08);
+      padding: 2px 6px;
+      border-radius: 6px;
+      color: #0f4f4b;
+    }
+
+    .footer {
+      margin-top: 28px;
+      padding: 22px 24px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--line);
+      background: linear-gradient(135deg, rgba(15, 118, 110, 0.08), rgba(180, 83, 9, 0.07));
+      box-shadow: var(--shadow);
+    }
+
+    .footer p {
+      margin: 0;
+      line-height: 1.8;
+      color: var(--muted);
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid,
+      .card-grid,
+      .metric-grid,
+      .stage-grid,
+      .name-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .section-header {
+        flex-direction: column;
+        align-items: start;
+      }
+
+      .flow {
+        min-width: 880px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page-shell {
+        width: min(var(--max), calc(100% - 20px));
+        padding-top: 18px;
+      }
+
+      .hero,
+      .section {
+        padding: 20px;
+        border-radius: 22px;
+      }
+
+      .timeline-card {
+        grid-template-columns: 1fr;
+      }
+
+      .timeline-step {
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="hero">
+      <span class="eyebrow">AI Telecom Bundle Generation System</span>
+      <h1>Architecture for GA-based bundle discovery, controlled naming, and final popularity scoring.</h1>
+      <p>
+        This page documents the exact solution: new telecom bundle structures are generated with a genetic algorithm,
+        each generated structure receives a deterministic placeholder name so it can be scored by the current popularity
+        model, then strong structures move to LLM-based final naming, validation, and final rescoring.
+      </p>
+
+      <div class="hero-grid">
+        <div class="glass">
+          <h3>System objective</h3>
+          <p>
+            Generate new telecom bundles that maximize a predicted popularity score, where higher popularity is used as
+            a signal for stronger expected revenue, better customer retention, and better market acceptance.
+          </p>
+          <div class="pill-list">
+            <span class="pill">Genetic Algorithm</span>
+            <span class="pill">Placeholder Naming</span>
+            <span class="pill">LLM Name Generation</span>
+            <span class="pill">Popularity Prediction</span>
+            <span class="pill">Dynamic Pricing Authority</span>
+          </div>
+        </div>
+
+        <div class="glass">
+          <h3>Core dependency</h3>
+          <p>
+            The popularity model depends on both structured features and <code>bundle_name</code> embeddings. Because of that,
+            a generated structure cannot be scored without some name. The solution is to use a controlled placeholder name
+            during optimization, then use the LLM only after top structures are found.
+          </p>
+        </div>
+      </div>
+    </header>
+
+    <section class="section" id="overview">
+      <div class="section-header">
+        <div>
+          <span class="tag">Overview</span>
+          <h2>1. What the system does</h2>
+        </div>
+        <div class="section-index">01</div>
+      </div>
+      <p class="label">
+        The system is designed to automatically discover and evaluate candidate telecom bundles such as data bundles, voice bundles,
+        SMS bundles, and mixed bundles using bundle fields like <code>bundle_type</code>, <code>price</code>, <code>usage_type</code>,
+        <code>service_class_category</code>, <code>configured_volume_mb</code>, <code>configured_volume_min</code>,
+        <code>configured_volume_sms</code>, and <code>validity_hours</code>.
+      </p>
+      <div class="metric-grid">
+        <div class="metric">
+          <strong>Stage 1</strong>
+          <p>GA generates and improves new bundle structures.</p>
+        </div>
+        <div class="metric">
+          <strong>Name bridge</strong>
+          <p>Placeholder naming makes each generated structure scorable by the current model.</p>
+        </div>
+        <div class="metric">
+          <strong>Stage 2</strong>
+          <p>LLM generates realistic commercial names only for promising structures.</p>
+        </div>
+        <div class="metric">
+          <strong>Final step</strong>
+          <p>The popularity model rescoring step chooses the best final bundle-name pair.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="problem-definition">
+      <div class="section-header">
+        <div>
+          <span class="tag accent">Problem Definition</span>
+          <h2>2. Why a hybrid pipeline is needed</h2>
+        </div>
+        <div class="section-index">02</div>
+      </div>
+      <div class="card-grid">
+        <article class="card">
+          <h3>Large search space</h3>
+          <p>
+            The bundle search space is large because it mixes categorical variables, numeric variables, and realistic business constraints.
+            Manual rule design is not enough to explore this space efficiently.
+          </p>
+        </article>
+        <article class="card">
+          <h3>Model dependency on text</h3>
+          <p>
+            The popularity model uses sentence embeddings of <code>bundle_name</code>, PCA on those embeddings, and scaled numeric features.
+            That means structure-only candidates are not directly scorable.
+          </p>
+        </article>
+        <article class="card">
+          <h3>Need for realism</h3>
+          <p>
+            The system must generate bundles that are not only high-scoring but also commercially interpretable, realistic, and consistent with telecom naming style.
+          </p>
+        </article>
+      </div>
+      <div class="note">
+        <strong>Key design question</strong>
+        <p>
+          If the GA generates only a new bundle structure, what is the bundle name used during scoring? The answer in this solution is:
+          every generated structure receives a deterministic placeholder name before it is passed into the popularity model.
+        </p>
+      </div>
+    </section>
+
+    <section class="section" id="architecture">
+      <div class="section-header">
+        <div>
+          <span class="tag">System Architecture</span>
+          <h2>3. Main system components</h2>
+        </div>
+        <div class="section-index">03</div>
+      </div>
+      <div class="card-grid">
+        <article class="card">
+          <h3>Historical data</h3>
+          <p>
+            Historical bundles are used to train the popularity model, define realistic feature ranges, seed the GA population, and provide style examples for final bundle naming.
+          </p>
+        </article>
+        <article class="card">
+          <h3>Bundle structure generator</h3>
+          <p>
+            The genetic algorithm generates candidate bundle structures using initialization, selection, crossover, mutation, and repair.
+          </p>
+        </article>
+        <article class="card">
+          <h3>Placeholder name generator</h3>
+          <p>
+            A deterministic function converts a generated structure into a basic and consistent name so the current popularity model can score it.
+          </p>
+        </article>
+        <article class="card">
+          <h3>Popularity scoring model</h3>
+          <p>
+            The trained model predicts popularity using structure, placeholder or final bundle name, and time-based fields such as <code>week_number</code> and <code>season</code>.
+          </p>
+        </article>
+        <article class="card">
+          <h3>LLM name generator</h3>
+          <p>
+            After strong structures are identified, the LLM generates realistic commercial bundle names that follow the operator naming style.
+          </p>
+        </article>
+        <article class="card">
+          <h3>Name validator and reranker</h3>
+          <p>
+            The validator checks name consistency, then the final scorer reranks valid bundle-name combinations and keeps the best offers.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="data-flow">
+      <div class="section-header">
+        <div>
+          <span class="tag">Data Flow</span>
+          <h2>4. End-to-end data flow</h2>
+        </div>
+        <div class="section-index">04</div>
+      </div>
+      <div class="diagram">
+        <div class="flow">
+          <div class="flow-row">
+            <div class="flow-card">
+              <strong>Historical data</strong>
+              <p>Past bundles define realistic ranges, training signals, population seeds, and naming examples.</p>
+            </div>
+            <div class="flow-card">
+              <strong>GA initialization</strong>
+              <p>Start from real bundles and valid synthetic candidates inside realistic bundle constraints.</p>
+            </div>
+            <div class="flow-card">
+              <strong>GA evolution</strong>
+              <p>Selection, crossover, mutation, and repair produce new candidate bundle structures.</p>
+            </div>
+            <div class="flow-card">
+              <strong>Placeholder naming</strong>
+              <p>Each generated structure gets a deterministic placeholder bundle name derived from its features.</p>
+            </div>
+            <div class="flow-card">
+              <strong>Popularity scoring</strong>
+              <p>The model scores the candidate using structure, placeholder name, and required time-based fields.</p>
+            </div>
+          </div>
+          <div class="arrow-row">
+            <div class="arrow"></div>
+            <div class="arrow"></div>
+            <div class="arrow"></div>
+            <div class="arrow"></div>
+          </div>
+          <div class="flow-row">
+            <div class="flow-card">
+              <strong>Selection of top structures</strong>
+              <p>High-scoring structures survive and become the strongest candidates after the stopping condition is reached.</p>
+            </div>
+            <div class="flow-card">
+              <strong>Trusted dynamic pricing model</strong>
+              <p>The trusted dynamic pricing model supplies the commercial price to be considered for the final offer.</p>
+            </div>
+            <div class="flow-card">
+              <strong>LLM name generation</strong>
+              <p>The LLM generates several realistic final names for each selected structure.</p>
+            </div>
+            <div class="flow-card">
+              <strong>Name validation</strong>
+              <p>Names are checked for consistency with resources, price, validity, and wording constraints.</p>
+            </div>
+            <div class="flow-card">
+              <strong>Final rescoring and output</strong>
+              <p>Valid final bundle-name pairs are rescored and the best telecom offers are returned.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="note">
+        <strong>Important pricing note</strong>
+        <p>
+          Your trusted dynamic pricing model is the price source that should be considered for the final offer. If the GA includes price as part of the search,
+          that GA price is treated as additional exploratory information, not as the main commercial authority. The page keeps that distinction explicit.
+        </p>
+      </div>
+    </section>
+
+    <section class="section" id="ga-stage">
+      <div class="section-header">
+        <div>
+          <span class="tag">Stage 1</span>
+          <h2>5. Genetic algorithm for bundle structures</h2>
+        </div>
+        <div class="section-index">05</div>
+      </div>
+      <div class="stage-grid">
+        <article class="card">
+          <h3>Why GA fits this problem</h3>
+          <ul class="bullet-list">
+            <li>The bundle design problem mixes categorical and numeric variables.</li>
+            <li>The search space is large and does not have a simple differentiable objective.</li>
+            <li>A predictive popularity model already exists and can be used as the fitness evaluator.</li>
+            <li>The GA can discover novel combinations beyond the historical catalog.</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>Chromosome definition</h3>
+          <ul class="bullet-list">
+            <li><code>bundle_type</code></li>
+            <li><code>price</code></li>
+            <li><code>usage_type</code></li>
+            <li><code>service_class_category</code></li>
+            <li><code>configured_volume_mb</code></li>
+            <li><code>configured_volume_min</code></li>
+            <li><code>configured_volume_sms</code></li>
+            <li><code>validity_hours</code></li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>Initialization</h3>
+          <p>
+            The initial population should combine real historical bundles with random but valid synthetic bundles that stay within realistic operator ranges.
+            This balances realism with diversity.
+          </p>
+        </article>
+        <article class="card">
+          <h3>Evolution operators</h3>
+          <p>
+            Selection keeps stronger candidates. Crossover combines features from parent bundles. Mutation perturbs fields like price, validity, data volume,
+            voice minutes, or SMS count. Repair keeps bundles valid after changes.
+          </p>
+        </article>
+      </div>
+      <div class="note">
+        <strong>Fitness design in Stage 1</strong>
+        <p>
+          The Stage 1 fitness function uses the popularity model with the generated structure plus its placeholder name. Conceptually:
+          <code>fitness(candidate_structure) = popularity_model(candidate_structure + placeholder_name) - penalties</code>.
+          Penalties can cover invalid combinations, unrealistic bundle ratios, out-of-range values, or business-policy violations.
+        </p>
+      </div>
+    </section>
+
+    <section class="section" id="placeholder">
+      <div class="section-header">
+        <div>
+          <span class="tag accent">Placeholder Naming</span>
+          <h2>6. The bridge that makes generated structures scorable</h2>
+        </div>
+        <div class="section-index">06</div>
+      </div>
+      <div class="name-grid">
+        <article class="card">
+          <h3>Why placeholder naming is required</h3>
+          <ul class="bullet-list">
+            <li>The popularity model expects a <code>bundle_name</code> input.</li>
+            <li>Generated structures cannot be scored if they have no name.</li>
+            <li>A deterministic naming bridge keeps optimization stable.</li>
+            <li>It avoids using the LLM inside every GA evaluation.</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>How the placeholder should behave</h3>
+          <ul class="bullet-list">
+            <li>Deterministic.</li>
+            <li>Consistent with the actual bundle fields.</li>
+            <li>Realistic enough to resemble telecom naming style.</li>
+            <li>Not creative and not overly variable.</li>
+          </ul>
+        </article>
+      </div>
+      <div class="table-wrap" style="margin-top: 18px;">
+        <table>
+          <thead>
+            <tr>
+              <th>Bundle type</th>
+              <th>Placeholder example</th>
+              <th>Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Data bundle</td>
+              <td><code>Forfait Data 5GB 7 jours@1500F</code></td>
+              <td>Produces a realistic, model-compatible name from the structure.</td>
+            </tr>
+            <tr>
+              <td>Voice bundle</td>
+              <td><code>Forfait Voix 100Min 30 jours@1200F</code></td>
+              <td>Keeps the naming style aligned with the training distribution.</td>
+            </tr>
+            <tr>
+              <td>Mix bundle</td>
+              <td><code>Forfait Mix 2GB + 50Min + 20SMS 7 jours@2500F</code></td>
+              <td>Includes only the resources actually present in the generated structure.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note">
+        <strong>Why not use blank or dummy names</strong>
+        <p>
+          Names like <code>bundle_001</code>, <code>test_name</code>, or <code>candidate_offer</code> would distort the popularity model input because the model was trained on telecom-like names.
+          The placeholder must therefore stay close to the naming style seen during training.
+        </p>
+      </div>
+    </section>
+    <section class="section" id="llm-stage">
+      <div class="section-header">
+        <div>
+          <span class="tag">Stage 2</span>
+          <h2>7. LLM-based final name generation</h2>
+        </div>
+        <div class="section-index">07</div>
+      </div>
+      <div class="stage-grid">
+        <article class="card">
+          <h3>Role of the LLM</h3>
+          <p>
+            The LLM is used only after the GA has identified promising bundle structures. Its role is to generate realistic, commercially attractive,
+            human-readable final names, not to act as the main optimizer.
+          </p>
+        </article>
+        <article class="card">
+          <h3>LLM inputs</h3>
+          <ul class="bullet-list">
+            <li>Bundle type</li>
+            <li>Data volume</li>
+            <li>Voice minutes</li>
+            <li>SMS volume</li>
+            <li>Validity</li>
+            <li>Price to be considered for the final offer</li>
+            <li>Usage type and naming style examples</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>LLM outputs</h3>
+          <p>
+            For each selected structure, the LLM should generate multiple candidate names such as 3, 5, or 10 variants. This gives controlled variation without letting free text drive the GA loop.
+          </p>
+        </article>
+        <article class="card">
+          <h3>Example naming behavior</h3>
+          <p>
+            For a bundle with <code>bundle_type = BUNDLE_DATA</code>, <code>configured_volume_mb = 5120</code>, <code>validity_hours = 168</code>, and <code>price = 1500</code>,
+            possible names include <code>Forfait Internet 5GB 7 jours@1500F</code>, <code>Pack Data 5GB Hebdo@1500F</code>, and <code>Forfait 5GB 7 jours@1500F</code>.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="validation">
+      <div class="section-header">
+        <div>
+          <span class="tag accent">Validation</span>
+          <h2>8. Final name validation and rescoring</h2>
+        </div>
+        <div class="section-index">08</div>
+      </div>
+      <div class="card-grid">
+        <article class="card">
+          <h3>Why validation is required</h3>
+          <p>
+            LLM-generated names can mention wrong quantities, invent features, mismatch validity, or use unrealistic wording. Every generated name must be validated before it is accepted.
+          </p>
+        </article>
+        <article class="card">
+          <h3>Validation rules</h3>
+          <ul class="bullet-list">
+            <li>If <code>configured_volume_mb == 0</code>, the name must not mention <code>MB</code> or <code>GB</code>.</li>
+            <li>If <code>configured_volume_min == 0</code>, the name must not mention minutes.</li>
+            <li>If <code>configured_volume_sms == 0</code>, the name must not mention SMS.</li>
+            <li>The name must include the correct price and match the actual validity.</li>
+            <li><code>Unlimited</code> or <code>Illimite</code> must only be used when valid.</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>Final reranking</h3>
+          <p>
+            Once valid names are generated, the final bundle-name pairs are rescored by the popularity model and the best final offers are kept.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="pricing">
+      <div class="section-header">
+        <div>
+          <span class="tag danger">Pricing Authority</span>
+          <h2>9. Role of the trusted dynamic pricing model</h2>
+        </div>
+        <div class="section-index">09</div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Pricing source</th>
+              <th>Meaning in this solution</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>GA price</td>
+              <td>
+                If price is included in the chromosome, it acts as additional exploratory information during search and can still be logged or compared.
+              </td>
+              <td>Additional, not primary</td>
+            </tr>
+            <tr>
+              <td>Trusted dynamic pricing model</td>
+              <td>
+                This is the price source you trust. It provides the commercial price that should be considered for the final bundle that moves into final naming and scoring.
+              </td>
+              <td>Primary price authority</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note">
+        <strong>How pricing fits without changing the solution</strong>
+        <p>
+          The architecture stays the same: GA generates bundle structures, placeholder naming enables initial scoring, top structures move to final naming, and final rescoring selects the best offers.
+          The trusted dynamic pricing model is added as the authoritative pricing layer, while any price proposed by the GA remains additional.
+        </p>
+      </div>
+    </section>
+
+    <section class="section" id="pipeline">
+      <div class="section-header">
+        <div>
+          <span class="tag">Pipeline</span>
+          <h2>10. Full execution pipeline</h2>
+        </div>
+        <div class="section-index">10</div>
+      </div>
+      <div class="timeline">
+        <div class="timeline-card">
+          <div class="timeline-step">1</div>
+          <div>
+            <h3>Prepare historical bundle data</h3>
+            <p>Use historical bundles to train the popularity model, define valid ranges, seed GA candidates, and provide naming examples.</p>
+          </div>
+        </div>
+        <div class="timeline-card">
+          <div class="timeline-step">2</div>
+          <div>
+            <h3>Build realistic search ranges and constraints</h3>
+            <p>Keep generated structures inside realistic telecom business limits.</p>
+          </div>
+        </div>
+        <div class="timeline-card">
+          <div class="timeline-step">3</div>
+          <div>
+            <h3>Initialize the GA population</h3>
+            <p>Mix historical bundles with valid synthetic candidates.</p>
+          </div>
+        </div>
+        <div class="timeline-card">
+          <div class="timeline-step">4</div>
+          <div>
+            <h3>Generate candidate bundle structures</h3>
+            <p>Apply selection, crossover, mutation, and repair across generations.</p>
+          </div>
+        </div>
+        <div class="timeline-card">
+          <div class="timeline-step">5</div>
+          <div>
+            <h3>Create placeholder names</h3>
+            <p>Attach a deterministic placeholder name to each generated structure so the current model can score it.</p>
+          </div>
+        </div>
+        <div class="timeline-card">
+          <div class="timeline-step">6</div>
+          <div>
+            <h3>Score with the popularity model</h3>
+            <p>Evaluate each candidate using structure, placeholder name, and required contextual fields.</p>
+          </div>
+        </div>
+        <div class="timeline-card">
+          <div class="timeline-step">7</div>
+          <div>
+            <h3>Repeat until the stopping condition</h3>
+            <p>Keep evolving until generation limits or convergence criteria are met.</p>
+          </div>
+        </div>
+        <div class="timeline-card">
+          <div class="timeline-step">8</div>
+          <div>
+            <h3>Select top final structures</h3>
+            <p>Take the strongest structures discovered by the GA.</p>
+          </div>
+        </div>
+        <div class="timeline-card">
+          <div class="timeline-step">9</div>
+          <div>
+            <h3>Apply the trusted dynamic pricing model</h3>
+            <p>Use the trusted pricing output as the final price to be considered for the commercial offer. Any GA price remains additional.</p>
+          </div>
+        </div>
+        <div class="timeline-card">
+          <div class="timeline-step">10</div>
+          <div>
+            <h3>Generate multiple final names with the LLM</h3>
+            <p>Create realistic commercial name variants for each selected structure.</p>
+          </div>
+        </div>
+        <div class="timeline-card">
+          <div class="timeline-step">11</div>
+          <div>
+            <h3>Validate names</h3>
+            <p>Reject names that do not match resources, price, validity, or wording rules.</p>
+          </div>
+        </div>
+        <div class="timeline-card">
+          <div class="timeline-step">12</div>
+          <div>
+            <h3>Rescore final bundle-name pairs</h3>
+            <p>Use the popularity model again and keep the best final telecom offers.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="advantages-risks">
+      <div class="section-header">
+        <div>
+          <span class="tag">Evaluation</span>
+          <h2>11. Advantages, risks, and safeguards</h2>
+        </div>
+        <div class="section-index">11</div>
+      </div>
+      <div class="card-grid">
+        <article class="card">
+          <h3>Advantages</h3>
+          <ul class="bullet-list">
+            <li>Works with the current popularity model.</li>
+            <li>Placeholder naming keeps early scoring stable.</li>
+            <li>The LLM is used where it adds value most: final commercial naming.</li>
+            <li>The system remains interpretable because structure scoring and final naming are separated.</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>Risks</h3>
+          <ul class="bullet-list">
+            <li>Text still influences the final score because the model uses name embeddings.</li>
+            <li>Bundles too far from the historical distribution may be less reliable.</li>
+            <li>Even after validation, some LLM names may still be awkward.</li>
+            <li>The popularity model predicts expected performance, not guaranteed market success.</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>Safeguards</h3>
+          <ul class="bullet-list">
+            <li>Use realistic business constraints and repair rules.</li>
+            <li>Keep placeholder naming deterministic during GA evolution.</li>
+            <li>Generate multiple final names and select the best valid one.</li>
+            <li>Log both structure-level and final rescored outputs for review.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="conclusion">
+      <div class="section-header">
+        <div>
+          <span class="tag accent">Conclusion</span>
+          <h2>12. Final recommended solution</h2>
+        </div>
+        <div class="section-index">12</div>
+      </div>
+      <p class="label">
+        The final recommended solution is to use a genetic algorithm to generate and optimize telecom bundle structures,
+        attach a deterministic placeholder bundle name so the current popularity model can score those structures,
+        use the trusted dynamic pricing model as the final price authority to be considered for the commercial offer,
+        generate realistic final names with an LLM, validate those names carefully, and rescore the final bundle-name pairs before selecting the best offers.
+      </p>
+      <div class="footer">
+        <p>
+          The key idea that keeps the system coherent is simple: generated bundle structures must receive a placeholder name during optimization
+          because the current popularity model requires <code>bundle_name</code>. The trusted dynamic pricing model is then layered into the same architecture
+          as the authoritative commercial pricing source, while any GA-generated price stays additional.
+        </p>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

@@ -225,3 +225,13 @@ def calculate_price_from_volume(target_volumes, validity_days, offer_type, confi
         'calculated_price': final_total_price,
         'individual_prices': individual_prices
     }
+
+
+bundle = calculate_price_from_volume(
+    {"voice": 200, "data": 500, "sms": 0},
+    validity_days=3,
+    offer_type="btl_normal",
+    config=PRICING_CONFIG
+)
+
+print(bundle)

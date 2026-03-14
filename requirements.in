@@ -17,3 +17,6 @@ pytorch-tabnet
 transformers
 catboost
 xgboost
+pydantic
+fastapi 
+uvicorn

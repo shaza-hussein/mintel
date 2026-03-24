@@ -1,0 +1,1818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MinTel | Autonomous Telecom Product Intelligence System</title>
+  <style>
+    :root {
+      --bg-deep: #08131d;
+      --bg-mid: #102233;
+      --bg-soft: #f5efe3;
+      --card: #fffdf9;
+      --ink: #14212b;
+      --muted: #5a6a77;
+      --line: rgba(20, 33, 43, 0.12);
+      --line-strong: rgba(20, 33, 43, 0.2);
+      --brand: #0ea68d;
+      --brand-dark: #0a7a69;
+      --accent: #d98f3a;
+      --accent-soft: #fff1df;
+      --danger: #d45c4f;
+      --danger-soft: #fff0ee;
+      --blue-soft: #e9f4fb;
+      --shadow: 0 18px 40px rgba(8, 19, 29, 0.08);
+      --radius: 18px;
+      --radius-sm: 12px;
+      --max: 1240px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, var(--bg-deep) 0px, var(--bg-mid) 300px, var(--bg-soft) 300px, var(--bg-soft) 100%);
+      font-family: "Aptos", "Segoe UI Variable Text", "Trebuchet MS", sans-serif;
+      line-height: 1.6;
+    }
+
+    h1, h2, h3, h4 {
+      margin: 0 0 12px;
+      line-height: 1.15;
+      font-family: "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
+      letter-spacing: -0.02em;
+    }
+
+    p {
+      margin: 0 0 14px;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .wrap {
+      width: min(var(--max), calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 42px 0 28px;
+      color: #f8fbfd;
+    }
+
+    .hero::before,
+    .hero::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      filter: blur(12px);
+      opacity: 0.24;
+      pointer-events: none;
+    }
+
+    .hero::before {
+      width: 380px;
+      height: 380px;
+      right: -80px;
+      top: -100px;
+      background: radial-gradient(circle, #f5b25f 0%, transparent 70%);
+    }
+
+    .hero::after {
+      width: 320px;
+      height: 320px;
+      left: -60px;
+      top: 40px;
+      background: radial-gradient(circle, #13c9ab 0%, transparent 72%);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.05);
+      font-size: 0.9rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #10c6a7, #f3b15f);
+      box-shadow: 0 0 18px rgba(16, 198, 167, 0.7);
+    }
+
+    .hero h1 {
+      font-size: clamp(2.6rem, 5vw, 4.6rem);
+      max-width: 980px;
+      margin-top: 18px;
+    }
+
+    .lead {
+      max-width: 930px;
+      font-size: 1.12rem;
+      color: rgba(248, 251, 253, 0.86);
+      margin-top: 14px;
+    }
+
+    .hero-note {
+      margin-top: 22px;
+      max-width: 940px;
+      padding: 16px 18px;
+      border-left: 4px solid #f3b15f;
+      background: rgba(255,255,255,0.06);
+      border-radius: 0 16px 16px 0;
+      color: rgba(248, 251, 253, 0.92);
+    }
+
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 26px;
+    }
+
+    .hero-stat {
+      padding: 18px;
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.05));
+      border: 1px solid rgba(255,255,255,0.12);
+      backdrop-filter: blur(10px);
+      min-height: 118px;
+    }
+
+    .hero-stat .label {
+      display: block;
+      font-size: 0.86rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: rgba(248, 251, 253, 0.68);
+      margin-bottom: 10px;
+    }
+
+    .hero-stat strong {
+      display: block;
+      font-size: 1.08rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+.hero-stat {
+  background: #ffffff;
+  border: 1px solid rgba(20, 33, 43, 0.12);
+}
+
+.hero-stat .label {
+  color: #5a6a77;
+}
+
+.hero-stat strong {
+  color: #14212b;
+}
+
+.hero-note {
+  background: #ffffff;
+  color: #14212b;
+  border-left: 4px solid #d98f3a;
+}
+
+.lead {
+  color: #020000;
+  margin-top: 50px;
+}
+
+
+
+    .sticky-nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(10px);
+      background: rgba(245, 239, 227, 0.84);
+      border-top: 1px solid rgba(255,255,255,0.08);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .nav-list {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding: 14px 0;
+      scrollbar-width: thin;
+    }
+
+    .nav-list a {
+      white-space: nowrap;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.7);
+      border: 1px solid rgba(20,33,43,0.08);
+      color: var(--ink);
+      font-size: 0.95rem;
+    }
+
+    .main {
+      padding: 34px 0 64px;
+    }
+
+    .section {
+      margin-bottom: 26px;
+      padding: 26px;
+      border-radius: 28px;
+      background: rgba(255,255,255,0.58);
+      border: 1px solid rgba(255,255,255,0.65);
+      box-shadow: var(--shadow);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: flex-start;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .section-no {
+      flex: 0 0 auto;
+      width: 54px;
+      height: 54px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--brand), var(--accent));
+      color: #fff;
+      font-weight: 800;
+      font-size: 1rem;
+      box-shadow: 0 12px 30px rgba(14, 166, 141, 0.26);
+    }
+
+    .section-head p {
+      color: var(--muted);
+      max-width: 900px;
+      margin-bottom: 0;
+    }
+
+    .grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .grid.two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid.three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .grid.four {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .card {
+      padding: 20px;
+      border-radius: var(--radius);
+      background: var(--card);
+      border: 1px solid var(--line);
+      box-shadow: 0 10px 24px rgba(8, 19, 29, 0.04);
+    }
+
+    .card h3 {
+      font-size: 1.22rem;
+    }
+
+    .card p:last-child,
+    .card ul:last-child,
+    .card ol:last-child {
+      margin-bottom: 0;
+    }
+
+    .card.accent {
+      background: linear-gradient(180deg, #fffaf2, #fffdf9);
+      border-color: rgba(217, 143, 58, 0.28);
+    }
+
+    .card.brand {
+      background: linear-gradient(180deg, #f3fffc, #fffdf9);
+      border-color: rgba(14, 166, 141, 0.25);
+    }
+
+    .card.warn {
+      background: linear-gradient(180deg, #fff8f7, #fffdf9);
+      border-color: rgba(212, 92, 79, 0.22);
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 12px;
+      border-radius: 999px;
+      background: #ffffff;
+      border: 1px solid var(--line);
+      font-size: 0.92rem;
+    }
+
+    .pill strong {
+      color: var(--brand-dark);
+    }
+
+    .mini-list {
+      padding-left: 18px;
+      margin: 12px 0 0;
+    }
+
+    .mini-list li {
+      margin-bottom: 8px;
+    }
+
+    .arch-layer {
+      padding: 18px;
+      border-radius: 22px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.74);
+      margin-bottom: 14px;
+      position: relative;
+    }
+
+    .arch-layer:last-child {
+      margin-bottom: 0;
+    }
+
+    .arch-layer::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: -15px;
+      transform: translateX(-50%);
+      width: 2px;
+      height: 16px;
+      background: linear-gradient(180deg, rgba(20,33,43,0.35), rgba(20,33,43,0.08));
+    }
+
+    .arch-layer:last-child::after {
+      display: none;
+    }
+
+    .arch-layer h3 {
+      margin-bottom: 12px;
+    }
+
+    .module-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .module {
+      padding: 14px;
+      border-radius: 16px;
+      background: #fffdf9;
+      border: 1px solid var(--line);
+      min-height: 110px;
+    }
+
+    .module .tag {
+      display: inline-block;
+      padding: 4px 8px;
+      margin-bottom: 10px;
+      border-radius: 999px;
+      background: var(--blue-soft);
+      color: #235474;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(8, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .step {
+      position: relative;
+      padding: 18px 16px;
+      border-radius: 16px;
+      background: #fffdf9;
+      border: 1px solid var(--line);
+      min-height: 180px;
+    }
+
+    .step .num {
+      display: inline-grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--brand), var(--accent));
+      color: #fff;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .step::after {
+      content: ">";
+      position: absolute;
+      right: -11px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(20, 33, 43, 0.25);
+      font-weight: 900;
+      font-size: 1.1rem;
+    }
+
+    .step:last-child::after {
+      display: none;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 16px;
+      background: #fffdf9;
+      border: 1px solid var(--line);
+    }
+
+    th, td {
+      text-align: left;
+      vertical-align: top;
+      padding: 14px 14px;
+      border-bottom: 1px solid var(--line);
+      font-size: 0.96rem;
+    }
+
+    th {
+      background: #f7f4ee;
+      font-family: "Aptos", "Segoe UI Variable Text", "Trebuchet MS", sans-serif;
+      font-size: 0.84rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #4f6170;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .kpi-group {
+      padding: 18px;
+      border-radius: 18px;
+      background: #fffdf9;
+      border: 1px solid var(--line);
+    }
+
+    .kpi-group h3 {
+      margin-bottom: 12px;
+    }
+
+    .kpi {
+      padding: 11px 0;
+      border-top: 1px dashed rgba(20,33,43,0.13);
+    }
+
+    .kpi:first-of-type {
+      border-top: none;
+      padding-top: 0;
+    }
+
+    .kpi strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .phase {
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: #fffdf9;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .phase::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 6px;
+      background: linear-gradient(180deg, var(--brand), var(--accent));
+    }
+
+    .phase .phase-no {
+      display: inline-block;
+      padding: 5px 9px;
+      margin-bottom: 10px;
+      border-radius: 999px;
+      background: var(--blue-soft);
+      color: #285677;
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .org-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .role {
+      padding: 16px;
+      border-radius: 16px;
+      background: #fffdf9;
+      border: 1px solid var(--line);
+      text-align: center;
+    }
+
+    .role strong {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .footer-panel {
+      padding: 24px;
+      border-radius: 26px;
+      background: linear-gradient(135deg, #102233, #17324a);
+      color: #eff6fa;
+      box-shadow: 0 18px 40px rgba(8, 19, 29, 0.16);
+    }
+
+    .footer-panel p {
+      color: rgba(239, 246, 250, 0.82);
+    }
+
+    .callout {
+      padding: 16px 18px;
+      border-radius: 16px;
+      border-left: 4px solid var(--brand);
+      background: #f2fffb;
+      border-top: 1px solid rgba(14, 166, 141, 0.18);
+      border-right: 1px solid rgba(14, 166, 141, 0.18);
+      border-bottom: 1px solid rgba(14, 166, 141, 0.18);
+    }
+
+    .warning {
+      padding: 16px 18px;
+      border-radius: 16px;
+      border-left: 4px solid var(--danger);
+      background: var(--danger-soft);
+      border-top: 1px solid rgba(212, 92, 79, 0.14);
+      border-right: 1px solid rgba(212, 92, 79, 0.14);
+      border-bottom: 1px solid rgba(212, 92, 79, 0.14);
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .small {
+      font-size: 0.92rem;
+    }
+
+    @media (max-width: 1120px) {
+      .hero-stats,
+      .grid.four,
+      .module-grid,
+      .timeline,
+      .org-grid,
+      .flow {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .grid.three {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 780px) {
+      .hero-stats,
+      .grid.two,
+      .grid.three,
+      .grid.four,
+      .module-grid,
+      .timeline,
+      .org-grid,
+      .flow {
+        grid-template-columns: 1fr;
+      }
+
+      .section {
+        padding: 22px 18px;
+      }
+
+      .section-head {
+        flex-direction: column;
+      }
+
+      .section-no {
+        width: 46px;
+        height: 46px;
+      }
+
+      .step::after {
+        display: none;
+      }
+
+      .hero h1 {
+        font-size: 2.35rem;
+      }
+    }
+
+    @media print {
+      body {
+        background: #ffffff;
+      }
+
+      .sticky-nav {
+        display: none;
+      }
+
+      .section,
+      .footer-panel {
+        box-shadow: none;
+        background: #ffffff;
+        border: 1px solid #d8d8d8;
+      }
+
+      .hero {
+        color: #13212c;
+      }
+
+      .hero::before,
+      .hero::after {
+        display: none;
+      }
+
+      .hero-note,
+      .hero-stat {
+        color: #13212c;
+        background: #ffffff;
+        border: 1px solid #d8d8d8;
+      }
+
+      .hero-stat .label,
+      .lead {
+        color: #475663;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero" id="top">
+    <div class="wrap">
+      <span class="eyebrow">MinTel System Blueprint</span>
+      <h1>Autonomous Telecom Product Intelligence Platform</h1>
+      <p class="lead">
+        A complete business and technical solution for generating new telecom bundles, selecting the right customers for each bundle,
+        and simulating financial and market outcomes before launch.
+      </p>
+      <div class="hero-note">
+        <strong>Non-negotiable design rule:</strong> all prices are produced by the existing <strong>Dynamic Pricing Algorithm</strong>.
+        MinTel does not override price. It uses your pricing output as the commercial anchor, then optimizes bundle design, targeting,
+        and launch strategy around it.
+      </div>
+
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="label">Primary Business Goal</span>
+          <strong>Maximize incremental revenue and contribution margin</strong>
+        </div>
+        <div class="hero-stat">
+          <span class="label">Core Decision Layers</span>
+          <strong>Bundle generation, offer targeting, simulation and governance</strong>
+        </div>
+        <div class="hero-stat">
+          <span class="label">Main Users</span>
+          <strong>Marketing, product, pricing, analytics, campaign and strategy teams</strong>
+        </div>
+        <div class="hero-stat">
+          <span class="label">Operating Style</span>
+          <strong>Human-supervised autonomy with closed-loop learning</strong>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="sticky-nav">
+    <div class="wrap nav-list">
+      <a href="#summary">Summary</a>
+      <a href="#challenges">Challenges</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#modules">Modules</a>
+      <a href="#bundle">Bundle Engine</a>
+      <a href="#targeting">Targeting</a>
+      <a href="#simulation">Simulation</a>
+      <a href="#workflow">Workflow</a>
+      <a href="#data">Data Contracts</a>
+      <a href="#kpis">KPIs</a>
+      <a href="#governance">Governance</a>
+      <a href="#team">Operating Model</a>
+      <a href="#roadmap">Roadmap</a>
+    </div>
+  </nav>
+
+  <main class="main">
+    <div class="wrap">
+
+      <section class="section" id="summary">
+        <div class="section-head">
+          <div class="section-no">01</div>
+          <div>
+            <h2>Executive Summary</h2>
+            <p>
+              MinTel should be built as a decision platform, not as a single model. The system needs three tightly connected engines:
+              <strong>Bundle Generation</strong>, <strong>Customer-Offer Recommendation</strong>, and a <strong>Simulation Engine</strong>.
+              These engines must share one product schema, one price source, one customer state model, and one KPI framework.
+            </p>
+          </div>
+        </div>
+
+        <div class="grid two">
+          <article class="card brand">
+            <h3>What the System Solves</h3>
+            <p>
+              Telecom product design is usually slow, manual, and fragmented. Marketing identifies demand, analysts study data,
+              product teams design bundles, pricing teams set prices, and campaign teams guess which customers should receive them.
+              MinTel replaces that fragmented workflow with one integrated decision process.
+            </p>
+          </article>
+
+          <article class="card accent">
+            <h3>What the System Produces</h3>
+            <p>
+              For every launch cycle, MinTel produces:
+            </p>
+            <ul class="mini-list">
+              <li>new bundle candidates designed for real customer needs</li>
+              <li>recommended audience lists for each bundle</li>
+              <li>expected adoption, revenue, churn impact, and cannibalization</li>
+              <li>pre-launch simulations across best, base, and worst market scenarios</li>
+              <li>clear approval-ready recommendations for marketing teams</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="callout">
+          <strong>Recommended business positioning:</strong> MinTel is an <strong>Autonomous Telecom Product Intelligence Platform</strong>
+          that designs offers, matches them to the right customers, and predicts business outcomes before launch.
+        </div>
+      </section>
+
+      <section class="section" id="challenges">
+        <div class="section-head">
+          <div class="section-no">02</div>
+          <div>
+            <h2>Strategic Challenges</h2>
+            <p>
+              The system should directly address two telecom pain points: product innovation speed and customer targeting precision.
+            </p>
+          </div>
+        </div>
+
+        <div class="grid two">
+          <article class="card warn">
+            <h3>Challenge A: Product and Bundle Creation</h3>
+            <ul class="mini-list">
+              <li>Manual product creation is too slow for a highly competitive telecom market.</li>
+              <li>Bundle design is often based on historical intuition, not a dynamic optimization process.</li>
+              <li>Pricing, design, and launch are separated across teams, which creates delay.</li>
+              <li>Operators lose revenue when they cannot react quickly to demand shifts or competitor moves.</li>
+              <li>Many bundles are launched without a strong forecast of adoption, cannibalization, or margin quality.</li>
+            </ul>
+          </article>
+
+          <article class="card warn">
+            <h3>Challenge B: Customer Targeting and Personalization</h3>
+            <ul class="mini-list">
+              <li>Broad segmentation treats many different customers as if they behave the same way.</li>
+              <li>Campaigns often target likely buyers instead of customers whose behavior can be changed.</li>
+              <li>Offer relevance is weak when there is no customer-level next-best-offer policy.</li>
+              <li>Generic campaigns reduce ROI, hurt engagement, and waste channel budget.</li>
+              <li>Without simulation, teams cannot see the effect of targeting before launch.</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="grid three" style="margin-top: 18px;">
+          <article class="card">
+            <h3>Revenue Risk</h3>
+            <p>Missed upsell, cross-sell, retention, and win-back opportunities due to delayed or weak offer decisions.</p>
+          </article>
+          <article class="card">
+            <h3>Portfolio Risk</h3>
+            <p>Poorly differentiated bundles can cannibalize existing plans and increase product complexity.</p>
+          </article>
+          <article class="card">
+            <h3>Execution Risk</h3>
+            <p>Launching without scenario simulation exposes the operator to commercial, customer, and network risk.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div class="section-no">03</div>
+          <div>
+            <h2>Design Principles</h2>
+            <p>
+              These principles keep the platform practical, commercially valid, and safe to operate inside a telecom business.
+            </p>
+          </div>
+        </div>
+
+        <div class="pill-row">
+          <span class="pill"><strong>Price Authority:</strong> only the existing Dynamic Pricing Algorithm sets price</span>
+          <span class="pill"><strong>Structured Generation:</strong> AI proposes bundles inside hard commercial rules</span>
+          <span class="pill"><strong>Customer-Level Policy:</strong> target the right person, not just the right segment</span>
+          <span class="pill"><strong>Portfolio Thinking:</strong> optimize bundles jointly, not one by one</span>
+          <span class="pill"><strong>Simulation Before Launch:</strong> forecast before deployment</span>
+          <span class="pill"><strong>Human Approval Gates:</strong> autonomy with clear oversight</span>
+          <span class="pill"><strong>Closed-Loop Learning:</strong> every campaign improves future decisions</span>
+          <span class="pill"><strong>Business-first KPIs:</strong> optimize profit and retention, not model accuracy alone</span>
+        </div>
+      </section>
+
+      <section class="section" id="architecture">
+        <div class="section-head">
+          <div class="section-no">04</div>
+          <div>
+            <h2>System Architecture</h2>
+            <p>
+              The architecture should be layered so the system is explainable, modular, and easy to govern. The simplest way to think
+              about it is: <strong>data foundation -> intelligence engines -> decision layer -> execution layer -> feedback loop</strong>.
+            </p>
+          </div>
+        </div>
+
+        <div class="arch-layer">
+          <h3>Layer 1: Enterprise Inputs and Data Foundation</h3>
+          <div class="module-grid">
+            <div class="module">
+              <div class="tag">Source</div>
+              <strong>Customer 360</strong>
+              <p class="small">Demographics, tenure, location, account type, household, enterprise flags, contract status.</p>
+            </div>
+            <div class="module">
+              <div class="tag">Source</div>
+              <strong>Usage and Network</strong>
+              <p class="small">Data usage, voice usage, SMS, roaming, QoS, congestion zones, device-network behavior.</p>
+            </div>
+            <div class="module">
+              <div class="tag">Source</div>
+              <strong>Billing and Revenue</strong>
+              <p class="small">ARPU, recharge behavior, payment history, margin proxy, payment friction, debt signals.</p>
+            </div>
+            <div class="module">
+              <div class="tag">Source</div>
+              <strong>Product and Campaign History</strong>
+              <p class="small">Current plans, previous plans, past offers, acceptance history, channel interactions, response logs.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="arch-layer">
+          <h3>Layer 2: MinTel Intelligence Core</h3>
+          <div class="module-grid">
+            <div class="module">
+              <div class="tag">Engine</div>
+              <strong>Opportunity Miner</strong>
+              <p class="small">Finds unmet demand, product gaps, under-monetized usage patterns, and retention opportunities.</p>
+            </div>
+            <div class="module">
+              <div class="tag">Engine</div>
+              <strong>Bundle Generation Engine</strong>
+              <p class="small">Creates bundle candidates using telecom rules, customer insight, strategic objectives, and design constraints.</p>
+            </div>
+            <div class="module">
+              <div class="tag">Engine</div>
+              <strong>Pricing Connector</strong>
+              <p class="small">Sends each candidate to the existing Dynamic Pricing Algorithm and receives the approved price.</p>
+            </div>
+            <div class="module">
+              <div class="tag">Engine</div>
+              <strong>Portfolio Optimizer</strong>
+              <p class="small">Selects the best launch set based on margin, adoption, simplicity, and cannibalization risk.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="arch-layer">
+          <h3>Layer 3: Customer and Market Decision Layer</h3>
+          <div class="module-grid">
+            <div class="module">
+              <div class="tag">Decision</div>
+              <strong>Targeting Engine</strong>
+              <p class="small">Ranks bundle-to-customer fit and decides which bundle should be shown to which customer.</p>
+            </div>
+            <div class="module">
+              <div class="tag">Decision</div>
+              <strong>Simulation Engine</strong>
+              <p class="small">Models launch outcomes under different market, competitor, and campaign conditions.</p>
+            </div>
+            <div class="module">
+              <div class="tag">Decision</div>
+              <strong>Scenario Workbench</strong>
+              <p class="small">Lets marketing teams compare strategies before launch using financial and customer impact views.</p>
+            </div>
+            <div class="module">
+              <div class="tag">Decision</div>
+              <strong>Governance Layer</strong>
+              <p class="small">Applies approval gates, guardrails, versioning, monitoring, and rollback controls.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="arch-layer">
+          <h3>Layer 4: Execution and Feedback</h3>
+          <div class="module-grid">
+            <div class="module">
+              <div class="tag">Execution</div>
+              <strong>Product Catalog and CRM</strong>
+              <p class="small">Approved bundles are published to catalog and linked to customer/product records.</p>
+            </div>
+            <div class="module">
+              <div class="tag">Execution</div>
+              <strong>Campaign and Sales Channels</strong>
+              <p class="small">SMS, app, web, retail, call center, USSD, IVR, partner channels, and digital commerce.</p>
+            </div>
+            <div class="module">
+              <div class="tag">Execution</div>
+              <strong>Billing and Fulfillment</strong>
+              <p class="small">Activation, entitlement provisioning, charging, and invoice consistency after launch.</p>
+            </div>
+            <div class="module">
+              <div class="tag">Learning</div>
+              <strong>Measurement Loop</strong>
+              <p class="small">Collects response, usage, churn, margin, and campaign outcomes to retrain the system.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout">
+          <strong>Architectural rule:</strong> MinTel should sit above core BSS/OSS systems as an intelligence and decision layer.
+          It should not replace billing, fulfillment, CRM, or product catalog systems.
+        </div>
+      </section>
+
+      <section class="section" id="modules">
+        <div class="section-head">
+          <div class="section-no">05</div>
+          <div>
+            <h2>Core Modules and Responsibilities</h2>
+            <p>
+              Each module needs clear ownership, inputs, outputs, and business value. This avoids turning the platform into a vague AI layer.
+            </p>
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Module</th>
+              <th>Purpose</th>
+              <th>Main Inputs</th>
+              <th>Main Outputs</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Opportunity Miner</strong></td>
+              <td>Detects high-potential market gaps and monetization opportunities.</td>
+              <td>Usage trends, churn signals, campaign history, product performance, competitor observations.</td>
+              <td>Opportunity briefs, unmet needs, candidate use cases, strategic triggers.</td>
+            </tr>
+            <tr>
+              <td><strong>Bundle Grammar and Rules Engine</strong></td>
+              <td>Defines the legal and business-valid bundle design space.</td>
+              <td>Commercial policy, product constraints, service catalog, eligibility rules.</td>
+              <td>Allowed bundle components, rule-checked bundle templates, forbidden combinations.</td>
+            </tr>
+            <tr>
+              <td><strong>Bundle Generation Engine</strong></td>
+              <td>Creates new bundle candidates for specific objectives.</td>
+              <td>Opportunity briefs, templates, rules, target use cases, strategic goals.</td>
+              <td>New bundle concepts with structured attributes and rationale.</td>
+            </tr>
+            <tr>
+              <td><strong>Pricing Connector</strong></td>
+              <td>Obtains price for each candidate from your pricing algorithm.</td>
+              <td>Bundle structure, costs, pricing request schema.</td>
+              <td>Approved price, pricing metadata, confidence or strategy labels.</td>
+            </tr>
+            <tr>
+              <td><strong>Commercial Scoring Layer</strong></td>
+              <td>Estimates adoption, margin, cannibalization, and strategic fit.</td>
+              <td>Bundle candidates, pricing output, customer signals, historical launches.</td>
+              <td>Commercial scorecards for each bundle candidate.</td>
+            </tr>
+            <tr>
+              <td><strong>Portfolio Optimizer</strong></td>
+              <td>Selects the best set of bundles to launch together.</td>
+              <td>Commercial scorecards, portfolio rules, capacity limits, campaign budget.</td>
+              <td>Recommended launch portfolio and rejected alternatives with reasons.</td>
+            </tr>
+            <tr>
+              <td><strong>Targeting Engine</strong></td>
+              <td>Matches customers to the most effective bundle and channel.</td>
+              <td>Customer 360, bundle portfolio, campaign history, response models.</td>
+              <td>Audience lists, next-best-offer policy, channel and timing recommendations.</td>
+            </tr>
+            <tr>
+              <td><strong>Simulation Engine</strong></td>
+              <td>Forecasts outcomes before launch under different scenarios.</td>
+              <td>Launch portfolio, targeting decisions, competitor assumptions, seasonality, network state.</td>
+              <td>Revenue forecasts, risk bands, churn impact, capacity stress, scenario comparison.</td>
+            </tr>
+            <tr>
+              <td><strong>Governance and Monitoring</strong></td>
+              <td>Keeps the platform safe, auditable, and controllable.</td>
+              <td>Model versions, decisions, approvals, KPI results, risk thresholds.</td>
+              <td>Audit logs, alerts, rollback triggers, compliance evidence.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="section" id="bundle">
+        <div class="section-head">
+          <div class="section-no">06</div>
+          <div>
+            <h2>Bundle Generation Engine</h2>
+            <p>
+              This is the part that creates new telecom bundles. It must be creative enough to discover revenue opportunities,
+              but constrained enough to remain commercially valid and operationally launchable.
+            </p>
+          </div>
+        </div>
+
+        <div class="grid two">
+          <article class="card brand">
+            <h3>How Bundle Generation Should Work</h3>
+            <ol class="mini-list">
+              <li>Start with a business objective such as acquisition, upsell, retention, win-back, youth growth, roaming monetization, or enterprise penetration.</li>
+              <li>Identify opportunity patterns from usage, churn, demand gaps, campaign outcomes, and portfolio weaknesses.</li>
+              <li>Generate bundle candidates inside a fixed telecom bundle grammar.</li>
+              <li>Send each candidate to the Dynamic Pricing Algorithm for the official price.</li>
+              <li>Estimate adoption, margin, retention impact, and cannibalization.</li>
+              <li>Choose a final portfolio of bundles rather than approving one bundle independently.</li>
+            </ol>
+          </article>
+
+          <article class="card accent">
+            <h3>Bundle Grammar: What a Bundle Can Contain</h3>
+            <ul class="mini-list">
+              <li>mobile data allowance, voice allowance, SMS allowance</li>
+              <li>validity period: daily, weekly, monthly, quarterly, seasonal</li>
+              <li>prepaid, postpaid, hybrid, family, youth, SME, enterprise, roaming, tourist</li>
+              <li>digital add-ons: streaming, gaming, cloud, education, social, productivity</li>
+              <li>fair usage policy, speed tier, hotspot, rollover, off-peak bonuses</li>
+              <li>device linkage, loyalty rewards, renewal incentives, recharge coupling</li>
+              <li>channel restrictions, region restrictions, customer eligibility rules</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="grid three" style="margin-top: 18px;">
+          <article class="card">
+            <h3>Hard Constraints</h3>
+            <ul class="mini-list">
+              <li>cannot break regulatory rules</li>
+              <li>cannot violate network capacity limits</li>
+              <li>cannot create impossible fulfillment combinations</li>
+              <li>cannot launch below margin floor unless explicitly approved</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Soft Constraints</h3>
+            <ul class="mini-list">
+              <li>keep bundle portfolio understandable for customers</li>
+              <li>limit internal complexity for campaign and sales teams</li>
+              <li>preserve brand position and product hierarchy</li>
+              <li>avoid over-fragmenting the catalog</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Scoring Dimensions</h3>
+            <ul class="mini-list">
+              <li>expected revenue uplift</li>
+              <li>expected contribution margin</li>
+              <li>retention impact</li>
+              <li>adoption confidence</li>
+              <li>cannibalization risk</li>
+              <li>strategic value</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="callout" style="margin-top: 18px;">
+          <strong>Important commercial rule:</strong> the system should optimize a <strong>bundle portfolio</strong>, not just a single bundle.
+          A bundle can look strong alone but still damage total revenue if it cannibalizes the rest of the catalog.
+        </div>
+      </section>
+
+      <section class="section" id="targeting">
+        <div class="section-head">
+          <div class="section-no">07</div>
+          <div>
+            <h2>Customer Targeting and Recommendation Engine</h2>
+            <p>
+              After the best bundles are selected, the next decision is: <strong>which bundle should be recommended to which customer, through which channel, and at what time?</strong>
+            </p>
+          </div>
+        </div>
+
+        <div class="grid two">
+          <article class="card brand">
+            <h3>Targeting Objective</h3>
+            <p>
+              Do not optimize for customers who are merely likely to buy. Optimize for customers whose behavior can be improved by the offer.
+              The system should estimate incremental business impact at the customer level and recommend the next-best-offer accordingly.
+            </p>
+            <ul class="mini-list">
+              <li>next-best-offer selection</li>
+              <li>next-best-channel selection</li>
+              <li>next-best-time selection</li>
+              <li>contact policy optimization</li>
+              <li>budget-aware campaign allocation</li>
+            </ul>
+          </article>
+
+          <article class="card accent">
+            <h3>Customer Features the Engine Should Use</h3>
+            <ul class="mini-list">
+              <li>current product and tenure</li>
+              <li>usage profile: voice-heavy, data-heavy, mixed, low-engagement</li>
+              <li>recharge and billing behavior</li>
+              <li>device type and capability</li>
+              <li>churn risk and loyalty signals</li>
+              <li>channel response history</li>
+              <li>price sensitivity and affordability patterns</li>
+              <li>household, SME, or shared-account context</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="grid four" style="margin-top: 18px;">
+          <article class="card">
+            <h3>Decision 1</h3>
+            <p><strong>Eligibility filter</strong><br />Remove customers who cannot legally or operationally receive the offer.</p>
+          </article>
+          <article class="card">
+            <h3>Decision 2</h3>
+            <p><strong>Offer uplift estimate</strong><br />Estimate how much each bundle changes expected revenue or retention for that customer.</p>
+          </article>
+          <article class="card">
+            <h3>Decision 3</h3>
+            <p><strong>Policy ranking</strong><br />Choose the best bundle after considering contact fatigue, channel cost, and campaign limits.</p>
+          </article>
+          <article class="card">
+            <h3>Decision 4</h3>
+            <p><strong>Execution package</strong><br />Send the final audience list with reason codes and confidence to campaign tools.</p>
+          </article>
+        </div>
+
+        <div class="warning" style="margin-top: 18px;">
+          <strong>Do not use only classic segmentation.</strong> Segments are useful for reporting and strategy, but campaign decisions should be made at customer level whenever possible.
+        </div>
+
+        <table style="margin-top: 18px;">
+          <thead>
+            <tr>
+              <th>Targeting Output</th>
+              <th>Why It Matters</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Customer ID + Recommended Bundle</strong></td>
+              <td>Defines the next-best-offer per customer rather than using one bundle for everyone.</td>
+            </tr>
+            <tr>
+              <td><strong>Expected Incremental Revenue</strong></td>
+              <td>Keeps campaign optimization tied to business value.</td>
+            </tr>
+            <tr>
+              <td><strong>Expected Retention Effect</strong></td>
+              <td>Prevents short-term revenue decisions from increasing future churn.</td>
+            </tr>
+            <tr>
+              <td><strong>Preferred Channel</strong></td>
+              <td>Improves acceptance and lowers communication cost.</td>
+            </tr>
+            <tr>
+              <td><strong>Reason Code</strong></td>
+              <td>Makes the recommendation interpretable for marketing teams.</td>
+            </tr>
+            <tr>
+              <td><strong>Confidence or Risk Band</strong></td>
+              <td>Supports approval and prioritization decisions.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="section" id="simulation">
+        <div class="section-head">
+          <div class="section-no">08</div>
+          <div>
+            <h2>Simulation Engine and Market Digital Twin</h2>
+            <p>
+              The simulation engine is what makes MinTel strategically powerful. It lets the marketing team test a new telecom bundle
+              before launching it in the real market.
+            </p>
+          </div>
+        </div>
+
+        <div class="grid two">
+          <article class="card brand">
+            <h3>What the Simulation Must Include</h3>
+            <ul class="mini-list">
+              <li>customer agents with heterogeneous behavior</li>
+              <li>current portfolio and newly proposed bundles</li>
+              <li>channel strategy and campaign budget</li>
+              <li>competitor reactions and market pressure</li>
+              <li>network load and quality implications</li>
+              <li>renewal, upgrade, downgrade, and churn behavior over time</li>
+            </ul>
+          </article>
+
+          <article class="card accent">
+            <h3>Simulation Outputs for Decision Makers</h3>
+            <ul class="mini-list">
+              <li>expected adoption by week and month</li>
+              <li>incremental revenue and margin over 30, 90, and 180 days</li>
+              <li>retention impact and churn delta</li>
+              <li>cannibalization against existing bundles</li>
+              <li>network stress or capacity pressure</li>
+              <li>best case, base case, and worst case scenario bands</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="flow" style="margin-top: 18px;">
+          <div class="step">
+            <div class="num">1</div>
+            <h3>Define Scenario</h3>
+            <p class="small">Select bundles, target groups, channels, budgets, timing, and market assumptions.</p>
+          </div>
+          <div class="step">
+            <div class="num">2</div>
+            <h3>Initialize Market State</h3>
+            <p class="small">Load customer states, product portfolio, current network conditions, and competitor baseline.</p>
+          </div>
+          <div class="step">
+            <div class="num">3</div>
+            <h3>Expose Offers</h3>
+            <p class="small">Simulate which customers actually see the offer through the chosen channels.</p>
+          </div>
+          <div class="step">
+            <div class="num">4</div>
+            <h3>Model Decisions</h3>
+            <p class="small">Customers accept, ignore, postpone, switch, or churn based on their individual state.</p>
+          </div>
+          <div class="step">
+            <div class="num">5</div>
+            <h3>Update Revenue</h3>
+            <p class="small">Track immediate and future revenue, costs, and margin from bundle adoption.</p>
+          </div>
+          <div class="step">
+            <div class="num">6</div>
+            <h3>Update Network Load</h3>
+            <p class="small">Measure whether the new bundle changes traffic, congestion, or quality in key areas.</p>
+          </div>
+          <div class="step">
+            <div class="num">7</div>
+            <h3>Apply Competitor Events</h3>
+            <p class="small">Test competitor discounting, copying, stronger retention action, or channel pressure.</p>
+          </div>
+          <div class="step">
+            <div class="num">8</div>
+            <h3>Compare Outcomes</h3>
+            <p class="small">Present scenario results to marketing with risk bands and recommended action.</p>
+          </div>
+        </div>
+
+        <div class="grid three" style="margin-top: 18px;">
+          <article class="card">
+            <h3>Scenario Type 1</h3>
+            <p><strong>Commercial Scenario</strong><br />What if we launch bundle A and B together versus bundle A alone?</p>
+          </article>
+          <article class="card">
+            <h3>Scenario Type 2</h3>
+            <p><strong>Competitive Scenario</strong><br />What if a competitor drops price or introduces a similar youth package?</p>
+          </article>
+          <article class="card">
+            <h3>Scenario Type 3</h3>
+            <p><strong>Operational Scenario</strong><br />What if network capacity is tight in high-usage cells after launch?</p>
+          </article>
+        </div>
+
+        <div class="callout" style="margin-top: 18px;">
+          <strong>Simulation principle:</strong> show probability ranges, not one point estimate. Marketing teams need uncertainty-aware decisions, not fake certainty.
+        </div>
+      </section>
+
+      <section class="section" id="workflow">
+        <div class="section-head">
+          <div class="section-no">09</div>
+          <div>
+            <h2>End-to-End Operating Workflow</h2>
+            <p>
+              This is the recommended business process from idea generation to launch and learning.
+            </p>
+          </div>
+        </div>
+
+        <div class="flow">
+          <div class="step">
+            <div class="num">1</div>
+            <h3>Objective Setup</h3>
+            <p class="small">Marketing defines the goal: growth, retention, upsell, roaming, SME acquisition, or churn defense.</p>
+          </div>
+          <div class="step">
+            <div class="num">2</div>
+            <h3>Opportunity Discovery</h3>
+            <p class="small">MinTel identifies unmet demand, behavioral patterns, and portfolio gaps.</p>
+          </div>
+          <div class="step">
+            <div class="num">3</div>
+            <h3>Bundle Creation</h3>
+            <p class="small">The system generates telecom bundle candidates within commercial and operational rules.</p>
+          </div>
+          <div class="step">
+            <div class="num">4</div>
+            <h3>Pricing</h3>
+            <p class="small">Every candidate is priced by the Dynamic Pricing Algorithm.</p>
+          </div>
+          <div class="step">
+            <div class="num">5</div>
+            <h3>Commercial Scoring</h3>
+            <p class="small">Candidates are evaluated for revenue, margin, simplicity, and cannibalization risk.</p>
+          </div>
+          <div class="step">
+            <div class="num">6</div>
+            <h3>Audience Assignment</h3>
+            <p class="small">Each approved bundle is matched to the most valuable customers and channels.</p>
+          </div>
+          <div class="step">
+            <div class="num">7</div>
+            <h3>Simulation</h3>
+            <p class="small">Marketing compares launch options before approving one strategy.</p>
+          </div>
+          <div class="step">
+            <div class="num">8</div>
+            <h3>Launch and Learn</h3>
+            <p class="small">The campaign is executed, measured, and fed back to MinTel for the next cycle.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="data">
+        <div class="section-head">
+          <div class="section-no">10</div>
+          <div>
+            <h2>Data Domains and Contracts</h2>
+            <p>
+              Since you already have access to telecom databases, the key challenge is not access. It is making the data usable,
+              consistent, timely, and governed for decision automation.
+            </p>
+          </div>
+        </div>
+
+        <div class="grid two">
+          <article class="card">
+            <h3>Critical Data Domains</h3>
+            <ul class="mini-list">
+              <li>customer master data and account hierarchy</li>
+              <li>subscription and product history</li>
+              <li>usage detail aggregated to customer-level features</li>
+              <li>recharge, billing, payment, debt, and revenue history</li>
+              <li>campaign exposure, response, and conversion events</li>
+              <li>network quality, congestion, and location indicators</li>
+              <li>customer service interactions and complaint signals</li>
+              <li>competitor observations and market events</li>
+            </ul>
+          </article>
+
+          <article class="card">
+            <h3>Data Contract Rules</h3>
+            <ul class="mini-list">
+              <li>standardized customer identifier across systems</li>
+              <li>bundle schema versioning for every candidate and launched offer</li>
+              <li>event timestamps with reliable time ordering</li>
+              <li>clear definitions for revenue, margin, churn, and conversion</li>
+              <li>audit trail linking bundle generation, pricing, targeting, and campaign outcomes</li>
+              <li>feature freshness standards for real-time, daily, and monthly decisions</li>
+            </ul>
+          </article>
+        </div>
+
+        <table style="margin-top: 18px;">
+          <thead>
+            <tr>
+              <th>Data Product</th>
+              <th>Used By</th>
+              <th>Refresh Requirement</th>
+              <th>Business Reason</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Customer 360 Feature Store</strong></td>
+              <td>Targeting, simulation, churn analysis</td>
+              <td>Daily minimum, near-real-time for digital channels if possible</td>
+              <td>Enables customer-level offer decisions.</td>
+            </tr>
+            <tr>
+              <td><strong>Bundle Catalog Model</strong></td>
+              <td>Generation, pricing, execution</td>
+              <td>Versioned on every change</td>
+              <td>Ensures design-to-launch consistency.</td>
+            </tr>
+            <tr>
+              <td><strong>Campaign Measurement Store</strong></td>
+              <td>Targeting retraining, lift analysis</td>
+              <td>Per campaign event</td>
+              <td>Supports incremental learning and ROI measurement.</td>
+            </tr>
+            <tr>
+              <td><strong>Market State Snapshot</strong></td>
+              <td>Simulation engine</td>
+              <td>Daily or per scenario batch</td>
+              <td>Anchors simulations in realistic starting conditions.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="section" id="kpis">
+        <div class="section-head">
+          <div class="section-no">11</div>
+          <div>
+            <h2>KPI Framework</h2>
+            <p>
+              MinTel should be measured as a business system, not just as an AI system. Success must be visible in commercial, customer,
+              and operational metrics.
+            </p>
+          </div>
+        </div>
+
+        <div class="grid three">
+          <article class="kpi-group">
+            <h3>Revenue KPIs</h3>
+            <div class="kpi">
+              <strong>Incremental Revenue</strong>
+              Revenue generated because of the new bundle versus control or baseline.
+            </div>
+            <div class="kpi">
+              <strong>Incremental Contribution Margin</strong>
+              Revenue after direct cost and offer economics.
+            </div>
+            <div class="kpi">
+              <strong>Portfolio Revenue Uplift</strong>
+              Total uplift after considering cannibalization and migration effects.
+            </div>
+          </article>
+
+          <article class="kpi-group">
+            <h3>Customer KPIs</h3>
+            <div class="kpi">
+              <strong>Adoption Rate</strong>
+              Share of targeted customers who activate the recommended bundle.
+            </div>
+            <div class="kpi">
+              <strong>Retention Lift</strong>
+              Reduction in churn or downgrade probability after bundle adoption.
+            </div>
+            <div class="kpi">
+              <strong>Offer Relevance Score</strong>
+              Proxy for how well the recommendation matches real customer need.
+            </div>
+          </article>
+
+          <article class="kpi-group">
+            <h3>Marketing KPIs</h3>
+            <div class="kpi">
+              <strong>Campaign ROI</strong>
+              Incremental margin relative to campaign and channel cost.
+            </div>
+            <div class="kpi">
+              <strong>Cost per Incremental Conversion</strong>
+              True campaign efficiency measure.
+            </div>
+            <div class="kpi">
+              <strong>Channel Efficiency</strong>
+              Performance by SMS, app, web, retail, call center, and other channels.
+            </div>
+          </article>
+
+          <article class="kpi-group">
+            <h3>Portfolio KPIs</h3>
+            <div class="kpi">
+              <strong>Cannibalization Rate</strong>
+              Share of adopters who would have generated similar value on an existing bundle.
+            </div>
+            <div class="kpi">
+              <strong>Catalog Simplicity Index</strong>
+              Measures whether the product set remains understandable and manageable.
+            </div>
+            <div class="kpi">
+              <strong>Launch Quality Score</strong>
+              Composite metric for margin, risk, adoption confidence, and strategic fit.
+            </div>
+          </article>
+
+          <article class="kpi-group">
+            <h3>Operational KPIs</h3>
+            <div class="kpi">
+              <strong>Time to Design New Bundle</strong>
+              Reduction in product creation cycle time.
+            </div>
+            <div class="kpi">
+              <strong>Time to Target Campaign</strong>
+              Speed from bundle approval to audience selection.
+            </div>
+            <div class="kpi">
+              <strong>Forecast Accuracy</strong>
+              Difference between simulated and actual launch outcomes.
+            </div>
+          </article>
+
+          <article class="kpi-group">
+            <h3>Governance KPIs</h3>
+            <div class="kpi">
+              <strong>Decision Explainability Rate</strong>
+              Share of recommendations with valid reason codes and traceability.
+            </div>
+            <div class="kpi">
+              <strong>Override Rate</strong>
+              How often humans reject system recommendations and why.
+            </div>
+            <div class="kpi">
+              <strong>Model Stability and Drift</strong>
+              Whether performance stays reliable across time and market shifts.
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="governance">
+        <div class="section-head">
+          <div class="section-no">12</div>
+          <div>
+            <h2>Governance, Risk, and Controls</h2>
+            <p>
+              A powerful autonomous system needs control points. Governance is not a side feature; it is part of the architecture.
+            </p>
+          </div>
+        </div>
+
+        <div class="grid two">
+          <article class="card">
+            <h3>Human Approval Gates</h3>
+            <ul class="mini-list">
+              <li>new bundle approval before catalog publication</li>
+              <li>exception approval for low-margin or high-risk launches</li>
+              <li>campaign approval before large-scale targeting</li>
+              <li>simulation review before major product change</li>
+              <li>rollback authority if early launch signals are weak</li>
+            </ul>
+          </article>
+
+          <article class="card">
+            <h3>Guardrails</h3>
+            <ul class="mini-list">
+              <li>margin floor thresholds</li>
+              <li>maximum allowed cannibalization</li>
+              <li>network utilization limits</li>
+              <li>contact fatigue and channel frequency caps</li>
+              <li>restricted offers for sensitive or regulated customer groups</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="grid three" style="margin-top: 18px;">
+          <article class="card">
+            <h3>Auditability</h3>
+            <p>Every launch decision should be traceable from generated bundle to price, audience, scenario results, approval, and final outcome.</p>
+          </article>
+          <article class="card">
+            <h3>Explainability</h3>
+            <p>Marketing users should see why a bundle was proposed, why a customer was targeted, and why a scenario is strong or weak.</p>
+          </article>
+          <article class="card">
+            <h3>Rollback</h3>
+            <p>The system must support safe shutdown, bundle withdrawal, campaign stop, and policy revert if live metrics deteriorate.</p>
+          </article>
+        </div>
+
+        <div class="warning" style="margin-top: 18px;">
+          <strong>Main risk to avoid:</strong> three disconnected models producing inconsistent answers.
+          Bundle generation, targeting, and simulation must use the same definitions for bundle, customer state, and business KPIs.
+        </div>
+      </section>
+
+      <section class="section" id="team">
+        <div class="section-head">
+          <div class="section-no">13</div>
+          <div>
+            <h2>Operating Model and Team Structure</h2>
+            <p>
+              MinTel will only work if business and technical ownership are both clear. This is not purely a data science project.
+            </p>
+          </div>
+        </div>
+
+        <div class="org-grid">
+          <div class="role">
+            <strong>Marketing Lead</strong>
+            Defines objectives, approves campaigns, interprets simulations.
+          </div>
+          <div class="role">
+            <strong>Product Manager</strong>
+            Owns bundle strategy, catalog fit, and launch prioritization.
+          </div>
+          <div class="role">
+            <strong>Pricing Owner</strong>
+            Owns the Dynamic Pricing Algorithm and pricing governance.
+          </div>
+          <div class="role">
+            <strong>Data Science Lead</strong>
+            Owns targeting, scoring, simulation logic, and measurement.
+          </div>
+          <div class="role">
+            <strong>Data Engineer / MLOps</strong>
+            Owns pipelines, feature store, deployment, monitoring, and retraining.
+          </div>
+          <div class="role">
+            <strong>Commercial Governance</strong>
+            Owns policy, risk thresholds, audit, and approval controls.
+          </div>
+        </div>
+
+        <div class="grid two" style="margin-top: 18px;">
+          <article class="card">
+            <h3>How Teams Should Work</h3>
+            <ul class="mini-list">
+              <li>Marketing defines intent and reviews launch alternatives.</li>
+              <li>Product teams define bundle policies, templates, and constraints.</li>
+              <li>Pricing remains the authority for price determination.</li>
+              <li>Data science builds decision logic and simulation.</li>
+              <li>Commercial governance approves exceptions and monitors risk.</li>
+            </ul>
+          </article>
+
+          <article class="card">
+            <h3>Best Decision Forum</h3>
+            <p>
+              Create a weekly or bi-weekly <strong>Offer Intelligence Council</strong> where MinTel recommendations are reviewed,
+              approved, launched, or rejected with a documented reason. This keeps the system aligned with real business priorities.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="roadmap">
+        <div class="section-head">
+          <div class="section-no">14</div>
+          <div>
+            <h2>Implementation Roadmap</h2>
+            <p>
+              Build MinTel in controlled phases. Do not try to automate everything on day one.
+            </p>
+          </div>
+        </div>
+
+        <div class="timeline">
+          <article class="phase">
+            <span class="phase-no">Phase 1</span>
+            <h3>Foundation</h3>
+            <p>
+              Define the bundle schema, customer feature store, KPI dictionary, and pricing integration contract.
+              Build the first version of the product opportunity and bundle generation workflow.
+            </p>
+          </article>
+
+          <article class="phase">
+            <span class="phase-no">Phase 2</span>
+            <h3>Bundle Intelligence</h3>
+            <p>
+              Add commercial scoring, catalog constraints, portfolio optimization, and bundle approval workflow.
+              Start generating new bundles with price anchored by the pricing algorithm.
+            </p>
+          </article>
+
+          <article class="phase">
+            <span class="phase-no">Phase 3</span>
+            <h3>Targeting Intelligence</h3>
+            <p>
+              Build customer-level offer recommendation, channel selection, control groups, and campaign measurement loops.
+              Move from segment-based targeting to next-best-offer policy.
+            </p>
+          </article>
+
+          <article class="phase">
+            <span class="phase-no">Phase 4</span>
+            <h3>Simulation Digital Twin</h3>
+            <p>
+              Build scenario planning, competitor reactions, network stress forecasting, and uncertainty-aware launch reports.
+              Validate the simulator with historical launches.
+            </p>
+          </article>
+
+          <article class="phase">
+            <span class="phase-no">Phase 5</span>
+            <h3>Controlled Autonomy</h3>
+            <p>
+              Allow the system to auto-recommend or partially auto-execute low-risk decisions inside strict guardrails,
+              with human approval for high-impact launches.
+            </p>
+          </article>
+        </div>
+
+        <div class="callout" style="margin-top: 18px;">
+          <strong>Recommended first milestone:</strong> deliver one fully working use case end-to-end, such as
+          <strong>monthly prepaid upsell bundles</strong> or <strong>retention bundles for high-data churn-risk users</strong>.
+          One closed-loop success is better than five incomplete modules.
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div class="section-no">15</div>
+          <div>
+            <h2>What Marketing Should Actually See</h2>
+            <p>
+              The interface should not expose model complexity. It should present clear business decisions.
+            </p>
+          </div>
+        </div>
+
+        <div class="grid three">
+          <article class="card brand">
+            <h3>Offer View</h3>
+            <p>Shows new bundle concepts, price from your pricing engine, value proposition, expected revenue, and key risks.</p>
+          </article>
+          <article class="card brand">
+            <h3>Audience View</h3>
+            <p>Shows who should receive each bundle, through which channel, and why the system believes it is the best fit.</p>
+          </article>
+          <article class="card brand">
+            <h3>Scenario View</h3>
+            <p>Shows what happens before launch if the bundle succeeds, underperforms, triggers cannibalization, or faces competitor reaction.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="footer-panel">
+        <h2>Final Positioning Statement</h2>
+        <p>
+          MinTel should be presented as an intelligent telecom decision platform that connects bundle innovation, personalized targeting,
+          and market simulation into one operating system for commercial growth.
+        </p>
+        <p>
+          The strongest version of MinTel is not "an AI that creates telecom offers." It is a controlled autonomous system that:
+          <strong>finds opportunities, creates bundles, uses your pricing engine for price, chooses the right customers, simulates the launch, and learns from outcomes.</strong>
+        </p>
+        <p>
+          If these parts share one common logic and one common KPI layer, MinTel becomes a real product strategy platform.
+          If they are built separately, it becomes three isolated demos.
+        </p>
+      </section>
+
+    </div>
+  </main>
+</body>
+</html>

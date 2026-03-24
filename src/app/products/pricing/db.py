@@ -1,11 +1,11 @@
 import os
 import sys
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..")))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../..")))
 
 import math
 import logging
 from typing import Dict, List, Tuple, Any
-from app.products.pricing.db_math import PricingMath
+from src.app.products.pricing.db_math import PricingMath
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(

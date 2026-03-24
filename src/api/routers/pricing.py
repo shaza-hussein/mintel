@@ -4,9 +4,9 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.
 
 
 from fastapi import APIRouter, HTTPException
-from app.products.pricing.config import PRICING_CONFIG  
-from app.products.pricing.db import DynamicPricingEngine
-from  app.api.models.pricing import (
+from src.app.products.pricing.config import PRICING_CONFIG  
+from src.app.products.pricing.db import DynamicPricingEngine
+from  src.api.models.pricing import (
     BundleRequest,
     BundleResponse,
     PriceLookupRequest,

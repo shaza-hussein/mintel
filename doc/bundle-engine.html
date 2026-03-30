@@ -1,0 +1,1451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Single-Operator Causal AI Spec for Telecom Bundle Incrementality and Cannibalization</title>
+  <style>
+    :root {
+      --bg: #f7f2e8;
+      --bg-soft: #eef4ef;
+      --paper: rgba(255,255,255,0.93);
+      --ink: #16212b;
+      --muted: #5b6770;
+      --line: #d9d0c2;
+      --brand: #14564b;
+      --brand-soft: rgba(20,86,75,0.10);
+      --accent: #1d4f7a;
+      --warn: #9b6200;
+      --bad: #a92b2b;
+      --good: #1f7a53;
+      --shadow: 0 14px 34px rgba(22,33,43,0.08);
+      --radius: 18px;
+      --sans: "IBM Plex Sans", "Segoe UI", Tahoma, sans-serif;
+      --serif: "Iowan Old Style", Georgia, serif;
+      --mono: "IBM Plex Mono", Consolas, "Courier New", monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      color: var(--ink);
+      line-height: 1.65;
+      background:
+        radial-gradient(circle at top left, rgba(20,86,75,0.08), transparent 30%),
+        radial-gradient(circle at top right, rgba(29,79,122,0.08), transparent 24%),
+        linear-gradient(180deg, var(--bg), var(--bg-soft));
+    }
+
+    .page {
+      width: min(1220px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 24px 0 80px;
+    }
+
+    .hero,
+    .section,
+    .toc,
+    .card,
+    .note,
+    .warn,
+    .good,
+    .formula {
+      background: var(--paper);
+      border: 1px solid rgba(22,33,43,0.08);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      padding: 34px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -70px;
+      top: -70px;
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle, rgba(20,86,75,0.16), transparent 68%);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--brand);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3, h4 {
+      margin-top: 0;
+      line-height: 1.18;
+    }
+
+    h1 {
+      font-family: var(--serif);
+      font-size: clamp(32px, 4vw, 54px);
+      max-width: 980px;
+      margin-bottom: 16px;
+    }
+
+    h2 {
+      font-size: 29px;
+      margin-bottom: 14px;
+    }
+
+    h3 {
+      font-size: 20px;
+      color: var(--brand);
+      margin-bottom: 10px;
+    }
+
+    h4 {
+      font-size: 15px;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    p {
+      margin: 0 0 14px;
+    }
+
+    .lead {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 1020px;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .pill {
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(22,33,43,0.10);
+      background: rgba(255,255,255,0.78);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .toc {
+      margin-top: 18px;
+      padding: 20px 24px;
+    }
+
+    .toc h2 {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+
+    .toc ul {
+      margin: 0;
+      padding-left: 20px;
+      columns: 2;
+      column-gap: 42px;
+    }
+
+    .toc li { margin: 7px 0; }
+
+    .toc a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .section {
+      margin-top: 22px;
+      padding: 28px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .section-index {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border-radius: 10px;
+      background: var(--brand-soft);
+      border: 1px solid rgba(20,86,75,0.18);
+      color: var(--brand);
+      font-weight: 800;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .card {
+      grid-column: span 12;
+      padding: 18px;
+    }
+
+    .span-4 { grid-column: span 12; }
+    .span-6 { grid-column: span 12; }
+    .span-8 { grid-column: span 12; }
+
+    .note,
+    .warn,
+    .good,
+    .formula {
+      padding: 18px 20px;
+      margin: 16px 0;
+    }
+
+    .note { border-left: 6px solid var(--accent); }
+    .warn { border-left: 6px solid var(--warn); background: #fff9f1; }
+    .good { border-left: 6px solid var(--good); background: #f2fbf6; }
+    .formula { border-left: 6px solid var(--brand); background: #faf8f2; }
+
+    .tag {
+      display: inline-block;
+      margin: 0 6px 6px 0;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(29,79,122,0.08);
+      border: 1px solid rgba(29,79,122,0.14);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .kpi {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .kpi .card {
+      padding: 14px;
+    }
+
+    .label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-weight: 800;
+    }
+
+    .value {
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--ink);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+
+    th, td {
+      text-align: left;
+      vertical-align: top;
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    th {
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--brand);
+    }
+
+    ul, ol {
+      margin: 0 0 14px 20px;
+    }
+
+    li { margin: 6px 0; }
+
+    pre, code {
+      font-family: var(--mono);
+      font-size: 13px;
+    }
+
+    pre {
+      margin: 0;
+      padding: 16px;
+      overflow-x: auto;
+      border-radius: 14px;
+      background: #121a24;
+      color: #e6edf5;
+      border: 1px solid rgba(255,255,255,0.05);
+      line-height: 1.55;
+    }
+
+    .footer {
+      margin-top: 28px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (min-width: 920px) {
+      .span-4 { grid-column: span 4; }
+      .span-6 { grid-column: span 6; }
+      .span-8 { grid-column: span 8; }
+    }
+
+    @media (max-width: 860px) {
+      .toc ul { columns: 1; }
+      .kpi { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 560px) {
+      .page { width: min(100% - 20px, 1220px); }
+      .hero, .toc, .section { padding: 20px; }
+      .kpi { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <header class="hero">
+      <p class="eyebrow">AI Telecom Bundles Engine / Single-Operator Design</p>
+      <h1>Single-Operator Causal AI Specification for Bundle Incrementality, Cannibalization, and GA-Based Bundle Optimization</h1>
+      <p class="lead">
+        This document defines a single-operator-only solution for deciding whether a new telecom bundle, or an optimized version
+        of an existing bundle, creates true incremental revenue or simply cannibalizes the operator's current portfolio.
+        The design assumes the system works on one operator's weekly data only and uses internal variation across region, channel,
+        segment, and time to estimate causal effects.
+      </p>
+      <div class="meta">
+        <span class="pill">Scope: exactly one telecom operator</span>
+        <span class="pill">Time grain: weekly / isoWeek</span>
+        <span class="pill">Goal: maximize net incremental portfolio revenue</span>
+        <span class="pill">Search engine: genetic algorithm seeded from this operator's portfolio</span>
+      </div>
+    </header>
+
+    <section class="toc">
+      <h2>Contents</h2>
+      <ul>
+        <li><a href="#scope">1. Scope and Non-Negotiable Assumptions</a></li>
+        <li><a href="#goal">2. Business Goal</a></li>
+        <li><a href="#questions">3. Questions the System Must Answer</a></li>
+        <li><a href="#single-operator-change">4. What Changes in a Single-Operator Setup</a></li>
+        <li><a href="#formalization">5. Formal Problem Definition</a></li>
+        <li><a href="#data">6. Required Data Model</a></li>
+        <li><a href="#identification">7. Causal Identification Strategy</a></li>
+        <li><a href="#models">8. Modeling Stack</a></li>
+        <li><a href="#scoring">9. Candidate Bundle Scoring</a></li>
+        <li><a href="#ga">10. Genetic Algorithm Integration</a></li>
+        <li><a href="#pipeline">11. End-to-End Pipeline</a></li>
+        <li><a href="#validation">12. Validation and Monitoring</a></li>
+        <li><a href="#deliverables">13. Engineering Deliverables</a></li>
+        <li><a href="#pseudocode">14. Reference Pseudocode</a></li>
+        <li><a href="#roadmap">15. MVP Roadmap</a></li>
+      </ul>
+    </section>
+
+    <section id="scope" class="section">
+      <div class="section-header">
+        <div class="section-index">1</div>
+        <h2>Scope and Non-Negotiable Assumptions</h2>
+      </div>
+
+      <div class="good">
+        <strong>This system is single-operator only.</strong>
+        It must use data from one operator and optimize decisions only for that operator's current and future portfolio.
+      </div>
+
+      <h3>1.1 Explicit Scope Rules</h3>
+      <ul>
+        <li>Do not compare multiple operators.</li>
+        <li>Do not pool different operators in the causal training data.</li>
+        <li>Do not estimate effects based on cross-operator differences.</li>
+        <li>Do not use other operators as controls for treatment unless the business later changes the system scope.</li>
+      </ul>
+
+      <h3>1.2 What the Dataset Represents</h3>
+      <p>
+        The dataset should represent one operator's product portfolio over time. If an <code>operator_id</code> column exists,
+        it is only for lineage and metadata, not a modeling dimension.
+      </p>
+
+      <div class="formula">
+        <pre>Modeling grain inside one operator:
+region x channel x segment x product x iso_week
+
+Optional simplified grain if some dimensions are unavailable:
+region x product x iso_week
+channel x product x iso_week
+segment x product x iso_week</pre>
+      </div>
+
+      <div class="warn">
+        <strong>Critical implication:</strong>
+        because there is only one operator, the causal variation must come from internal rollout differences:
+        region-level timing, channel-level timing, segment eligibility, or phased launches over time.
+      </div>
+    </section>
+
+    <section id="goal" class="section">
+      <div class="section-header">
+        <div class="section-index">2</div>
+        <h2>Business Goal</h2>
+      </div>
+
+      <p>
+        The system must recommend a new bundle, or optimize an existing one, only if the recommendation is expected to improve
+        the operator's total portfolio revenue after subtracting the revenue lost from existing products that are cannibalized.
+      </p>
+
+      <div class="formula">
+        <pre>Business objective =
+maximize risk-adjusted net incremental revenue
+within one operator's portfolio</pre>
+      </div>
+
+      <div class="kpi">
+        <div class="card">
+          <div class="label">Primary Target</div>
+          <div class="value">Net Incremental Revenue</div>
+        </div>
+        <div class="card">
+          <div class="label">Decision Scope</div>
+          <div class="value">One Operator</div>
+        </div>
+        <div class="card">
+          <div class="label">Search Space</div>
+          <div class="value">Current Portfolio + New Variants</div>
+        </div>
+        <div class="card">
+          <div class="label">Risk Control</div>
+          <div class="value">Cannibalization Bound</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="questions" class="section">
+      <div class="section-header">
+        <div class="section-index">3</div>
+        <h2>Questions the System Must Answer</h2>
+      </div>
+
+      <div class="grid">
+        <div class="card span-6">
+          <h3>Bundle-Level Questions</h3>
+          <ul>
+            <li>Will this candidate bundle create new value for the operator?</li>
+            <li>Will this bundle improve the operator's total weekly portfolio revenue?</li>
+            <li>Is the bundle incremental or cannibalistic after considering product substitution?</li>
+          </ul>
+        </div>
+
+        <div class="card span-6">
+          <h3>Portfolio-Level Questions</h3>
+          <ul>
+            <li>Which existing bundles are likely to lose sales if this new bundle is launched?</li>
+            <li>How much weekly revenue is expected to be lost by each affected bundle?</li>
+            <li>What is the net portfolio gain after all positive and negative product interactions?</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="good">
+        <strong>Required output for each candidate:</strong>
+        <ul>
+          <li>Predicted gross adoption</li>
+          <li>Predicted new-bundle revenue</li>
+          <li>Predicted revenue stolen from existing bundles</li>
+          <li>Predicted net incremental revenue for the operator portfolio</li>
+          <li>Ranked list of the most affected current products</li>
+          <li>Confidence-aware accept or reject signal</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="single-operator-change" class="section">
+      <div class="section-header">
+        <div class="section-index">4</div>
+        <h2>What Changes in a Single-Operator Setup</h2>
+      </div>
+
+      <p>
+        In a multi-operator design, one could exploit variation across operators. In this design, that is not allowed.
+        All estimation must come from changes inside the same operator over time.
+      </p>
+
+      <h3>4.1 Units of Analysis</h3>
+      <p>
+        Let <code>u</code> denote an internal unit of the operator. Depending on data availability, <code>u</code> can be:
+      </p>
+      <p>
+        <span class="tag">region</span>
+        <span class="tag">channel</span>
+        <span class="tag">segment</span>
+        <span class="tag">region x channel</span>
+        <span class="tag">region x segment</span>
+        <span class="tag">channel x segment</span>
+        <span class="tag">region x channel x segment</span>
+      </p>
+
+      <h3>4.2 Source of Causal Variation</h3>
+      <ul>
+        <li>Bundle launched in some regions before others</li>
+        <li>Bundle launched on digital channel before retail</li>
+        <li>Offer opened to prepaid before postpaid</li>
+        <li>Pilot rollout in selected internal markets before wider release</li>
+        <li>Feature or price change applied first to only part of the operator base</li>
+      </ul>
+
+      <div class="warn">
+        If the operator always launches every bundle everywhere at the same moment, the causal confidence will be weak.
+        In that case the business should create internal variation through phased rollout, holdout regions, holdout channels,
+        or segment-based eligibility rules.
+      </div>
+    </section>
+
+    <section id="formalization" class="section">
+      <div class="section-header">
+        <div class="section-index">5</div>
+        <h2>Formal Problem Definition</h2>
+      </div>
+
+      <p>
+        Let <code>k</code> denote a candidate bundle, <code>j</code> an existing bundle in the operator portfolio,
+        <code>u</code> an internal operator unit, and <code>t</code> a week.
+      </p>
+
+      <h3>5.1 Treatment Definition</h3>
+      <div class="formula">
+        <pre>T_k(u, t) = 1 if candidate bundle k is available in unit u at week t
+T_k(u, t) = 0 otherwise</pre>
+      </div>
+
+      <h3>5.2 Outcomes</h3>
+      <div class="formula">
+        <pre>Y_portfolio(u, t) = total portfolio revenue of the operator in unit u at week t
+Y_j(u, t)         = revenue of existing product j in unit u at week t
+Y_k(u, t)         = revenue of candidate/new product k in unit u at week t</pre>
+      </div>
+
+      <h3>5.3 Causal Quantities</h3>
+      <div class="formula">
+        <pre>Portfolio Lift of candidate k:
+Delta_portfolio(k) =
+  E[Y_portfolio | do(T_k=1)] - E[Y_portfolio | do(T_k=0)]
+
+Effect of candidate k on existing product j:
+Delta_j<-k =
+  E[Y_j | do(T_k=1)] - E[Y_j | do(T_k=0)]
+
+Total Cannibalized Revenue:
+CannibalizedRev(k) =
+  sum over j of max(0, -Delta_j<-k)
+
+Positive Spillover Revenue:
+PositiveSpilloverRev(k) =
+  sum over j of max(0, Delta_j<-k)
+
+Net Incremental Revenue:
+NetIncrementalRev(k) =
+  Delta_portfolio(k)</pre>
+      </div>
+
+      <h3>5.4 Business Interpretation</h3>
+      <ul>
+        <li>If <code>NetIncrementalRev(k) &gt; 0</code>, the bundle is incremental at the operator-portfolio level.</li>
+        <li>If the new bundle sells well but <code>NetIncrementalRev(k) &lt;= 0</code>, it is cannibalistic.</li>
+        <li>Products with the most negative <code>Delta_j&lt;-k</code> are the bundles most harmed by the new product.</li>
+      </ul>
+    </section>
+
+    <section id="data" class="section">
+      <div class="section-header">
+        <div class="section-index">6</div>
+        <h2>Required Data Model</h2>
+      </div>
+
+      <h3>6.1 Core Weekly Fact Table</h3>
+      <p>
+        The recommended base table is one row per:
+      </p>
+
+      <div class="formula">
+        <pre>region x channel x segment x product x iso_week
+within one fixed operator</pre>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Column</th>
+            <th>Type</th>
+            <th>Purpose</th>
+            <th>Need</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>iso_week</code></td>
+            <td>time</td>
+            <td>Weekly time index</td>
+            <td>Required</td>
+          </tr>
+          <tr>
+            <td><code>region_id</code></td>
+            <td>categorical</td>
+            <td>Internal geography or market cluster</td>
+            <td>Strongly recommended</td>
+          </tr>
+          <tr>
+            <td><code>channel_id</code></td>
+            <td>categorical</td>
+            <td>Digital, retail, agent, distributor, etc.</td>
+            <td>Recommended</td>
+          </tr>
+          <tr>
+            <td><code>segment_id</code></td>
+            <td>categorical</td>
+            <td>Prepaid, postpaid, youth, SME, etc.</td>
+            <td>Recommended</td>
+          </tr>
+          <tr>
+            <td><code>product_id</code></td>
+            <td>categorical</td>
+            <td>Bundle identifier in the operator portfolio</td>
+            <td>Required</td>
+          </tr>
+          <tr>
+            <td><code>active_subscribers</code></td>
+            <td>numeric</td>
+            <td>Installed base in that week</td>
+            <td>Required</td>
+          </tr>
+          <tr>
+            <td><code>gross_adds</code></td>
+            <td>numeric</td>
+            <td>New additions</td>
+            <td>Required</td>
+          </tr>
+          <tr>
+            <td><code>renewals</code></td>
+            <td>numeric</td>
+            <td>Repeat purchases / renewals</td>
+            <td>Recommended</td>
+          </tr>
+          <tr>
+            <td><code>churn_out</code></td>
+            <td>numeric</td>
+            <td>Exits from this product</td>
+            <td>Recommended</td>
+          </tr>
+          <tr>
+            <td><code>revenue</code></td>
+            <td>numeric</td>
+            <td>Observed weekly revenue</td>
+            <td>Required</td>
+          </tr>
+          <tr>
+            <td><code>margin</code></td>
+            <td>numeric</td>
+            <td>Optional profitability target</td>
+            <td>Recommended</td>
+          </tr>
+          <tr>
+            <td><code>price</code></td>
+            <td>numeric</td>
+            <td>Bundle price</td>
+            <td>Required</td>
+          </tr>
+          <tr>
+            <td><code>data_gb</code></td>
+            <td>numeric</td>
+            <td>Data benefit</td>
+            <td>Required</td>
+          </tr>
+          <tr>
+            <td><code>voice_min</code></td>
+            <td>numeric</td>
+            <td>Voice benefit</td>
+            <td>Required</td>
+          </tr>
+          <tr>
+            <td><code>sms_count</code></td>
+            <td>numeric</td>
+            <td>SMS benefit</td>
+            <td>Optional</td>
+          </tr>
+          <tr>
+            <td><code>validity_days</code></td>
+            <td>numeric</td>
+            <td>Bundle validity</td>
+            <td>Required</td>
+          </tr>
+          <tr>
+            <td><code>marketing_spend</code></td>
+            <td>numeric</td>
+            <td>Controls confounding from promotion</td>
+            <td>Strongly recommended</td>
+          </tr>
+          <tr>
+            <td><code>competitor_pressure_index</code></td>
+            <td>numeric</td>
+            <td>External market context</td>
+            <td>Recommended</td>
+          </tr>
+          <tr>
+            <td><code>holiday_flag</code></td>
+            <td>bool</td>
+            <td>Seasonality control</td>
+            <td>Required</td>
+          </tr>
+          <tr>
+            <td><code>availability_flag</code></td>
+            <td>bool</td>
+            <td>Product available or not in that unit/week</td>
+            <td>Required</td>
+          </tr>
+          <tr>
+            <td><code>stockout_flag</code></td>
+            <td>bool</td>
+            <td>Operational distortion control</td>
+            <td>Recommended</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>6.2 Product Event Table</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Column</th>
+            <th>Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>product_id</code></td>
+            <td>Target product</td>
+          </tr>
+          <tr>
+            <td><code>event_type</code></td>
+            <td><code>new_launch</code>, <code>price_change</code>, <code>feature_change</code>, <code>retirement</code></td>
+          </tr>
+          <tr>
+            <td><code>event_week</code></td>
+            <td>Week of effect start</td>
+          </tr>
+          <tr>
+            <td><code>treated_regions</code></td>
+            <td>Regions receiving the intervention</td>
+          </tr>
+          <tr>
+            <td><code>treated_channels</code></td>
+            <td>Channels receiving the intervention</td>
+          </tr>
+          <tr>
+            <td><code>treated_segments</code></td>
+            <td>Segments receiving the intervention</td>
+          </tr>
+          <tr>
+            <td><code>rollout_phase</code></td>
+            <td>Pilot, phased, full, etc.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>6.3 Candidate Bundle Representation for GA</h3>
+      <p>
+        Each GA chromosome should encode bundle attributes that are relevant to adoption, substitution, and revenue impact:
+      </p>
+      <p>
+        <span class="tag">price</span>
+        <span class="tag">data_gb</span>
+        <span class="tag">voice_min</span>
+        <span class="tag">sms_count</span>
+        <span class="tag">validity_days</span>
+        <span class="tag">target_segment</span>
+        <span class="tag">channel_scope</span>
+        <span class="tag">bundle_family</span>
+        <span class="tag">promo_depth</span>
+        <span class="tag">free_addons</span>
+        <span class="tag">fair_use_policy</span>
+      </p>
+    </section>
+
+    <section id="identification" class="section">
+      <div class="section-header">
+        <div class="section-index">7</div>
+        <h2>Causal Identification Strategy</h2>
+      </div>
+
+      <p>
+        The system must estimate causal effects from internal differences inside the operator, not from simple before/after trends.
+      </p>
+
+      <h3>7.1 Preferred Historical Method</h3>
+      <div class="good">
+        Use a within-operator panel causal estimator centered on staggered launch timing across internal units.
+        In practical terms, this is a difference-in-differences or event-study design using
+        region, channel, segment, and week variation inside the operator.
+      </div>
+
+      <h3>7.2 Treatment Units</h3>
+      <ul>
+        <li><code>u = region</code> when rollout differs by geography</li>
+        <li><code>u = channel</code> when rollout differs by sales channel</li>
+        <li><code>u = segment</code> when rollout differs by customer segment</li>
+        <li><code>u = region x channel</code> or <code>region x segment</code> when more granularity is available</li>
+      </ul>
+
+      <h3>7.3 Core Assumptions</h3>
+      <ul>
+        <li>Treated and untreated internal units would have followed similar trends absent the launch.</li>
+        <li>Marketing and promo differences are controlled as explicit covariates.</li>
+        <li>The launch flag correctly represents real product availability.</li>
+        <li>No major internal operational shock is wrongly attributed to the launch.</li>
+      </ul>
+
+      <h3>7.4 Required Controls</h3>
+      <ul>
+        <li>Week-of-year and seasonal calendar controls</li>
+        <li>Holiday and payday effects</li>
+        <li>Marketing spend and campaign intensity</li>
+        <li>Region fixed effects</li>
+        <li>Channel fixed effects</li>
+        <li>Segment fixed effects</li>
+        <li>Competitor pressure index where available</li>
+        <li>Portfolio age and maturity signals</li>
+      </ul>
+
+      <div class="warn">
+        If historical launches have no internal staggered rollout at all, then future production deployment should deliberately introduce pilot launches,
+        holdout units, or controlled phased rollout. Otherwise the model can still rank likely candidates, but the confidence in incrementality estimates
+        will be materially weaker.
+      </div>
+    </section>
+
+    <section id="models" class="section">
+      <div class="section-header">
+        <div class="section-index">8</div>
+        <h2>Modeling Stack</h2>
+      </div>
+
+      <p>
+        The solution should be implemented as several coordinated models. One single model is not enough.
+      </p>
+
+      <div class="grid">
+        <div class="card span-6">
+          <h3>Model A: Popularity / Adoption Model</h3>
+          <p>Purpose: estimate gross uptake of a candidate bundle inside the operator.</p>
+          <ul>
+            <li>Target: <code>gross_adds</code>, <code>active_subscribers</code>, or first-N-week uptake</li>
+            <li>Uses only this operator's historical bundles</li>
+            <li>Output is a demand prior, not the final business answer</li>
+          </ul>
+        </div>
+
+        <div class="card span-6">
+          <h3>Model B: Within-Operator Launch Effect Model</h3>
+          <p>Purpose: estimate causal effect of a launch on total portfolio revenue within internal units.</p>
+          <ul>
+            <li>Outcome: <code>Y_portfolio(u,t)</code></li>
+            <li>Uses internal variation by unit and week</li>
+            <li>Returns portfolio lift from historical launches</li>
+          </ul>
+        </div>
+
+        <div class="card span-6">
+          <h3>Model C: Pairwise Cannibalization Model</h3>
+          <p>Purpose: estimate effect of candidate bundle <code>k</code> on each existing bundle <code>j</code>.</p>
+          <ul>
+            <li>Outcome: <code>Delta_j&lt;-k</code></li>
+            <li>Training rows describe interactions between launched bundles and incumbents</li>
+            <li>Returns a ranked affected-product list</li>
+          </ul>
+        </div>
+
+        <div class="card span-6">
+          <h3>Model D: Candidate Effect Generalizer</h3>
+          <p>Purpose: extrapolate from observed launches to unseen GA-generated bundles.</p>
+          <ul>
+            <li>Learns how bundle attributes and context change causal impact</li>
+            <li>Used to score candidates that have never been launched before</li>
+            <li>Should produce mean effect and uncertainty estimate</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>8.1 Pairwise Interaction Features</h3>
+      <ul>
+        <li>Price gap between candidate and incumbent</li>
+        <li>Relative price per GB and price per minute</li>
+        <li>Benefit overlap score across data, voice, SMS, and validity</li>
+        <li>Target segment overlap</li>
+        <li>Channel overlap</li>
+        <li>Bundle family similarity</li>
+        <li>Margin attractiveness difference</li>
+        <li>Incumbent popularity / maturity / churn profile</li>
+      </ul>
+
+      <div class="formula">
+        <pre>C(k, j, context) =
+predicted causal effect of launching candidate k
+on the revenue of current product j
+inside the same operator
+
+If C(k, j, context) < 0, product j is cannibalized by k</pre>
+      </div>
+
+      <div class="note">
+        Because the system is single-operator, data volume will usually be lower than a multi-operator setup.
+        Use pooled models with shrinkage across products, regions, channels, and segments rather than many tiny isolated models.
+      </div>
+    </section>
+
+    <section id="scoring" class="section">
+      <div class="section-header">
+        <div class="section-index">9</div>
+        <h2>Candidate Bundle Scoring</h2>
+      </div>
+
+      <p>
+        The scenario scorer is the core decision layer used by the GA. It converts a candidate bundle plus a current portfolio
+        snapshot into a causal business recommendation.
+      </p>
+
+      <h3>9.1 Scoring Sequence</h3>
+      <ol>
+        <li>Estimate candidate gross adoption using the popularity model.</li>
+        <li>Estimate revenue generated directly by the new bundle.</li>
+        <li>Estimate impact on every existing product in the current operator portfolio.</li>
+        <li>Aggregate revenue losses from harmed incumbents.</li>
+        <li>Aggregate positive spillovers if any exist.</li>
+        <li>Compute net incremental portfolio revenue.</li>
+        <li>Apply confidence-aware decision logic.</li>
+      </ol>
+
+      <h3>9.2 Core Equations</h3>
+      <div class="formula">
+        <pre>PredictedNewBundleRevenue(k) =
+  predicted_gross_adds(k) * expected_revenue_per_add(k)
+
+CannibalizedRev(k) =
+  sum over existing products j of max(0, -C(k, j, context))
+
+PositiveSpilloverRev(k) =
+  sum over existing products j of max(0, C(k, j, context))
+
+NetIncrementalRev(k) =
+  PredictedNewBundleRevenue(k)
+  + PositiveSpilloverRev(k)
+  - CannibalizedRev(k)
+  - LaunchCost(k)
+  - PromoCost(k)</pre>
+      </div>
+
+      <h3>9.3 Cannibalization Ratio</h3>
+      <div class="formula">
+        <pre>CannibalizationRatio(k) =
+  CannibalizedRev(k) / max(epsilon, PredictedNewBundleRevenue(k))</pre>
+      </div>
+
+      <h3>9.4 Confidence-Aware Score</h3>
+      <div class="formula">
+        <pre>RiskAdjustedLift(k) =
+  LowerConfidenceBound(NetIncrementalRev(k))
+
+Example:
+LCB = mean_lift - z * standard_error</pre>
+      </div>
+
+      <div class="good">
+        <strong>Production acceptance rule:</strong>
+        accept a candidate only if:
+        <ul>
+          <li><code>RiskAdjustedLift(k) &gt; 0</code></li>
+          <li><code>CannibalizationRatio(k)</code> is below threshold</li>
+          <li>No protected current product exceeds maximum allowed loss</li>
+          <li>All pricing and margin constraints are valid</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="ga" class="section">
+      <div class="section-header">
+        <div class="section-index">10</div>
+        <h2>Genetic Algorithm Integration</h2>
+      </div>
+
+      <p>
+        The GA must start from the current portfolio of this operator only. It can mutate current bundles, generate adjacent variants,
+        or synthesize new bundles within business-safe boundaries.
+      </p>
+
+      <h3>10.1 Initial Population</h3>
+      <div class="formula">
+        <pre>Initial population =
+current operator portfolio
++ slight feature mutations
++ allowed new combinations within product design rules</pre>
+      </div>
+
+      <h3>10.2 Chromosome Structure</h3>
+      <div class="formula">
+        <pre>Chromosome = [
+  price,
+  data_gb,
+  voice_min,
+  sms_count,
+  validity_days,
+  segment_target,
+  channel_scope,
+  bundle_family,
+  promo_depth,
+  free_addons,
+  fair_use_policy,
+  optional_business_flags
+]</pre>
+      </div>
+
+      <h3>10.3 Fitness Function</h3>
+      <div class="formula">
+        <pre>Fitness(k) =
+    w1 * normalize(RiskAdjustedLift(k))
+  + w2 * normalize(PopularityScore(k))
+  - w3 * normalize(CannibalizationRatio(k))
+  - w4 * normalize(OverlapPenalty(k))
+  - w5 * normalize(ComplexityPenalty(k))</pre>
+      </div>
+
+      <h3>10.4 Constraint Set</h3>
+      <ul>
+        <li>Price must stay within approved commercial ranges.</li>
+        <li>Bundle contents must satisfy technical feasibility.</li>
+        <li>Margin must stay above minimum acceptable threshold.</li>
+        <li>Net incremental revenue lower bound must be positive for recommended candidates.</li>
+        <li>Protected flagship products cannot be excessively harmed.</li>
+      </ul>
+
+      <div class="warn">
+        The popularity score should not dominate the fitness function.
+        A candidate may be highly popular and still be rejected if it mostly steals users from profitable current products.
+      </div>
+    </section>
+
+    <section id="pipeline" class="section">
+      <div class="section-header">
+        <div class="section-index">11</div>
+        <h2>End-to-End Pipeline</h2>
+      </div>
+
+      <div class="grid">
+        <div class="card span-4">
+          <h3>Step 1: Build Weekly Panel</h3>
+          <ul>
+            <li>Assemble one operator's weekly sales table</li>
+            <li>Create internal units by region, channel, segment</li>
+            <li>Join product catalog and event metadata</li>
+            <li>Create portfolio-level weekly aggregates</li>
+          </ul>
+        </div>
+
+        <div class="card span-4">
+          <h3>Step 2: Build Event Registry</h3>
+          <ul>
+            <li>Store launches, price changes, feature changes, retirements</li>
+            <li>Track exact unit-level availability by week</li>
+            <li>Track phased rollout scope</li>
+          </ul>
+        </div>
+
+        <div class="card span-4">
+          <h3>Step 3: Train Base Models</h3>
+          <ul>
+            <li>Train popularity model</li>
+            <li>Train portfolio lift estimator</li>
+            <li>Train pairwise cannibalization model</li>
+            <li>Train effect generalizer for unseen candidates</li>
+          </ul>
+        </div>
+
+        <div class="card span-6">
+          <h3>Step 4: Scenario Scoring Service</h3>
+          <ul>
+            <li>Input: candidate bundle + current portfolio snapshot + rollout context</li>
+            <li>Output: adoption, new revenue, cannibalization, affected products, net lift, confidence band</li>
+          </ul>
+        </div>
+
+        <div class="card span-6">
+          <h3>Step 5: GA Search Loop</h3>
+          <ul>
+            <li>Generate candidates</li>
+            <li>Score each candidate via scenario scorer</li>
+            <li>Select by causal fitness, not raw demand</li>
+            <li>Return top ranked bundles for recommendation or pilot launch</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>11.1 Internal Service Boundaries</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Module</th>
+            <th>Responsibility</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>feature_store_builder</code></td>
+            <td>Builds weekly panel and engineered features for one operator</td>
+          </tr>
+          <tr>
+            <td><code>event_registry</code></td>
+            <td>Stores product interventions and rollout units</td>
+          </tr>
+          <tr>
+            <td><code>popularity_service</code></td>
+            <td>Predicts gross adoption of candidate bundles</td>
+          </tr>
+          <tr>
+            <td><code>portfolio_lift_service</code></td>
+            <td>Estimates total portfolio effect of a bundle launch</td>
+          </tr>
+          <tr>
+            <td><code>cannibalization_service</code></td>
+            <td>Predicts affected current products and revenue deltas</td>
+          </tr>
+          <tr>
+            <td><code>scenario_scorer</code></td>
+            <td>Aggregates all outputs into a final candidate score</td>
+          </tr>
+          <tr>
+            <td><code>ga_optimizer</code></td>
+            <td>Searches bundle design space</td>
+          </tr>
+          <tr>
+            <td><code>monitoring_dashboard</code></td>
+            <td>Tracks realized outcomes versus predictions after launch</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>11.2 Example Scoring API</h3>
+      <pre>{
+  "portfolio_snapshot_week": "2026-W12",
+  "context": {
+    "region_id": "R1",
+    "channel_id": "digital",
+    "segment_id": "prepaid"
+  },
+  "candidate_bundle": {
+    "price": 35,
+    "data_gb": 20,
+    "voice_min": 300,
+    "sms_count": 100,
+    "validity_days": 28,
+    "segment_target": "prepaid",
+    "channel_scope": ["digital"],
+    "bundle_family": "combo",
+    "free_addons": ["social_pass"]
+  }
+}</pre>
+
+      <pre>{
+  "predicted_gross_adds": 18240,
+  "predicted_new_bundle_revenue": 638400,
+  "cannibalized_revenue": 241900,
+  "positive_spillover_revenue": 18500,
+  "net_incremental_revenue": 415000,
+  "net_incremental_revenue_lcb": 301200,
+  "cannibalization_ratio": 0.379,
+  "affected_products": [
+    {"product_id": "BND_12", "revenue_delta": -103000},
+    {"product_id": "BND_03", "revenue_delta": -76400},
+    {"product_id": "BND_17", "revenue_delta": -42500}
+  ],
+  "decision": "ACCEPT"
+}</pre>
+    </section>
+
+    <section id="validation" class="section">
+      <div class="section-header">
+        <div class="section-index">12</div>
+        <h2>Validation and Monitoring</h2>
+      </div>
+
+      <h3>12.1 Offline Validation</h3>
+      <ul>
+        <li>Backtest on historical launches within the same operator.</li>
+        <li>Check pre-trends between treated and untreated internal units.</li>
+        <li>Run placebo launch dates to test false positive lift.</li>
+        <li>Compare predicted harmed products against realized post-launch declines.</li>
+        <li>Measure whether confidence bands are calibrated.</li>
+      </ul>
+
+      <h3>12.2 Online Validation</h3>
+      <ul>
+        <li>Use phased rollout when launching top candidates.</li>
+        <li>Track predicted versus realized portfolio lift week by week.</li>
+        <li>Track predicted versus realized incumbent bundle losses.</li>
+        <li>Retrain and recalibrate after each validated launch cycle.</li>
+      </ul>
+
+      <h3>12.3 Core Monitoring Metrics</h3>
+      <div class="kpi">
+        <div class="card">
+          <div class="label">Portfolio Lift Accuracy</div>
+          <div class="value">Predicted vs Realized</div>
+        </div>
+        <div class="card">
+          <div class="label">Hit Precision</div>
+          <div class="value">Top Affected Products</div>
+        </div>
+        <div class="card">
+          <div class="label">Confidence Quality</div>
+          <div class="value">CI / LCB Coverage</div>
+        </div>
+        <div class="card">
+          <div class="label">Decision Quality</div>
+          <div class="value">Accept vs Reject Outcomes</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="deliverables" class="section">
+      <div class="section-header">
+        <div class="section-index">13</div>
+        <h2>Engineering Deliverables</h2>
+      </div>
+
+      <ol>
+        <li>A clean weekly panel dataset for one operator.</li>
+        <li>An internal unit-level product event registry.</li>
+        <li>A popularity model trained only on this operator's portfolio history.</li>
+        <li>A within-operator launch effect estimator.</li>
+        <li>A pairwise cannibalization model across current products.</li>
+        <li>A scenario scorer that returns net incremental portfolio revenue.</li>
+        <li>A GA optimizer that uses causal fitness.</li>
+        <li>A monitoring layer for post-launch validation.</li>
+      </ol>
+
+      <div class="good">
+        <strong>Minimum business-ready answer for any candidate bundle:</strong>
+        <ol>
+          <li>Is it incremental or cannibalistic for this operator?</li>
+          <li>How much weekly portfolio revenue lift is expected?</li>
+          <li>Which existing bundles in this operator are most affected?</li>
+          <li>Should the optimizer keep or discard the candidate?</li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="pseudocode" class="section">
+      <div class="section-header">
+        <div class="section-index">14</div>
+        <h2>Reference Pseudocode</h2>
+      </div>
+
+      <h3>14.1 Training Phase</h3>
+      <pre># 1) Build weekly panel for one operator only
+panel = build_weekly_panel(
+    raw_sales,
+    product_catalog,
+    event_table,
+    internal_controls
+)
+
+# panel grain:
+# region x channel x segment x product x iso_week
+
+# 2) Train popularity / adoption model
+popularity_model.fit(
+    X = panel[candidate_features + context_features],
+    y = panel["gross_adds"]
+)
+
+# 3) Estimate historical launch effects within the operator
+portfolio_lift_model.fit(
+    data = panel,
+    treatment = "availability_flag",
+    outcome = "portfolio_revenue",
+    unit_keys = ["region_id", "channel_id", "segment_id"],
+    time_key = "iso_week",
+    controls = confounder_features
+)
+
+# 4) Build pairwise rows:
+# each row describes how a launched bundle k affected existing bundle j
+pairwise_rows = build_pairwise_rows(
+    panel=panel,
+    event_table=event_table,
+    current_products=current_portfolio_products
+)
+
+pairwise_cannibal_model.fit(
+    X = pairwise_rows[pair_features + context_features],
+    y = pairwise_rows["delta_revenue_on_existing_product"]
+)
+
+# 5) Train candidate effect generalizer
+effect_generalizer.fit(
+    X = pairwise_rows[candidate_features + pair_features + context_features],
+    y = pairwise_rows["delta_portfolio_or_product_revenue"]
+)</pre>
+
+      <h3>14.2 Candidate Scoring Phase</h3>
+      <pre>def score_candidate(candidate, context, current_portfolio):
+    gross_adds = popularity_model.predict(candidate, context)
+
+    new_bundle_revenue = revenue_model(candidate, gross_adds, context)
+
+    cannibalized_revenue = 0.0
+    positive_spillover = 0.0
+    affected_products = []
+
+    for incumbent in current_portfolio:
+        pair_x = build_pair_features(candidate, incumbent, context)
+        delta = pairwise_cannibal_model.predict(pair_x)
+
+        affected_products.append({
+            "product_id": incumbent.product_id,
+            "revenue_delta": delta
+        })
+
+        if delta < 0:
+            cannibalized_revenue += abs(delta)
+        else:
+            positive_spillover += delta
+
+    net_incremental_revenue = (
+        new_bundle_revenue
+        + positive_spillover
+        - cannibalized_revenue
+        - estimate_launch_cost(candidate, context)
+        - estimate_promo_cost(candidate, context)
+    )
+
+    lcb = lower_confidence_bound(net_incremental_revenue)
+
+    cannibalization_ratio = (
+        cannibalized_revenue / max(1.0, new_bundle_revenue)
+    )
+
+    affected_products.sort(key=lambda row: row["revenue_delta"])
+
+    return {
+        "predicted_gross_adds": gross_adds,
+        "predicted_new_bundle_revenue": new_bundle_revenue,
+        "cannibalized_revenue": cannibalized_revenue,
+        "positive_spillover_revenue": positive_spillover,
+        "net_incremental_revenue": net_incremental_revenue,
+        "net_incremental_revenue_lcb": lcb,
+        "cannibalization_ratio": cannibalization_ratio,
+        "affected_products": affected_products[:10]
+    }</pre>
+
+      <h3>14.3 GA Evaluation Loop</h3>
+      <pre>def fitness(candidate, context, current_portfolio):
+    result = score_candidate(candidate, context, current_portfolio)
+
+    overlap_penalty = compute_overlap_penalty(candidate, current_portfolio)
+    complexity_penalty = compute_complexity_penalty(candidate)
+
+    return (
+        w1 * normalize(result["net_incremental_revenue_lcb"])
+        + w2 * normalize(popularity_score(candidate, context))
+        - w3 * normalize(result["cannibalization_ratio"])
+        - w4 * normalize(overlap_penalty)
+        - w5 * normalize(complexity_penalty)
+    )
+
+population = initialize_from_current_operator_portfolio(current_portfolio)
+
+for generation in range(max_generations):
+    scored = [(candidate, fitness(candidate, context, current_portfolio)) for candidate in population]
+    selected = selection(scored)
+    children = crossover_and_mutation(selected, constraints=business_rules)
+    population = elitism(scored) + children
+
+best_candidates = rank_final_population(population)</pre>
+    </section>
+
+    <section id="roadmap" class="section">
+      <div class="section-header">
+        <div class="section-index">15</div>
+        <h2>MVP Roadmap</h2>
+      </div>
+
+      <div class="grid">
+        <div class="card span-4">
+          <h3>Phase 1: Trustworthy Baseline</h3>
+          <ul>
+            <li>Build one-operator weekly panel</li>
+            <li>Create product event registry</li>
+            <li>Train popularity model</li>
+            <li>Build simple within-operator lift estimator</li>
+          </ul>
+        </div>
+
+        <div class="card span-4">
+          <h3>Phase 2: Cannibalization Intelligence</h3>
+          <ul>
+            <li>Build pairwise cannibalization dataset</li>
+            <li>Train affected-product ranking model</li>
+            <li>Create scenario scorer API</li>
+            <li>Add confidence-aware decision logic</li>
+          </ul>
+        </div>
+
+        <div class="card span-4">
+          <h3>Phase 3: Full Optimization</h3>
+          <ul>
+            <li>Integrate GA</li>
+            <li>Seed from current operator portfolio</li>
+            <li>Use phased launches for validation</li>
+            <li>Close the loop with post-launch monitoring</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="good">
+        <strong>Final engineering rule:</strong>
+        the optimizer must maximize
+        <strong>risk-adjusted net incremental revenue for this single operator</strong>,
+        not gross sales, not raw popularity, and not isolated product-level demand.
+      </div>
+    </section>
+
+    <div class="footer">
+      Single-Operator Causal AI Telecom Bundles Engine Specification
+    </div>
+
+  </div>
+</body>
+</html>

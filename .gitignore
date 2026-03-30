@@ -13,3 +13,5 @@ venv/
 # Logs
 *.log
 
+# Models folder
+_models/

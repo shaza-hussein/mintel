@@ -10,3 +10,7 @@
 - **notebooks**: notebooks
 - **scripts**: scripts
 - **tests**: tests
+
+## To run the backend
+
+    uvicorn src.api.main:app --reload --port 8000

@@ -13,4 +13,4 @@
 
 ## To run the backend
 
-    uvicorn src.api.main:app --reload --port 8000
+    uvicorn src.api.main:app --reload --host 0.0.0.0 --port 8000

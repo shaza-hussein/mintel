@@ -1,6 +1,6 @@
 pandas==2.3.3
 numpy==2.3.4
-scikit-learn==1.7.2
+scikit-learn==1.6.1
 sentence-transformers==5.1.2
 gensim==4.4.0
 umap-learn==0.5.9.post2
@@ -20,6 +20,7 @@ xgboost==3.1.2
 pydantic==2.12.5
 fastapi==0.135.1
 uvicorn==0.41.0
-deap==1.4
-dowhy==0.14
 ctgan==0.12.1
+pyspark==4.1.1
+dotenv
+pydantic_settings

@@ -22,7 +22,7 @@ class ModelConfig:
     target_col: str = "popularity"
     test_size: float = 0.2
     random_state: int = 42
-    use_time_split: bool = False
+    use_time_split: bool = True
     rare_threshold: int = 5
 
     n_estimators: int = 500

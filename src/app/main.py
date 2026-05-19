@@ -1,7 +1,7 @@
 TRAIN: bool = False
 MBA: bool =  False
 CTGAN: bool = False
-GraphSAGE: bool = True
+GraphSAGE: bool = False
 #----------------------------------------------------------------------------------------
 # Trainer
 #----------------------------------------------------------------------------------------
@@ -83,7 +83,7 @@ else:
     if GraphSAGE:
         from customers.targeting.graphSAGE.inference import GraphSAGERecommender
         recommender = GraphSAGERecommender()
-        ALL_REC: bool = True
+        ALL_REC: bool = False
         if ALL_REC:
             # TODO: Get recommednations for all msisdns we have.
             from customers.targeting.graphSAGE.config import ArtifactConfig

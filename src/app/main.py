@@ -1,6 +1,7 @@
 TRAIN: bool = False
 MBA: bool =  False
 CTGAN: bool = False
+GraphSAGE: bool = True
 #----------------------------------------------------------------------------------------
 # Trainer
 #----------------------------------------------------------------------------------------
@@ -78,6 +79,64 @@ else:
         with open("sankey_bundles.json", "w", encoding="utf-8") as f:
             json.dump(sankey_bundles, f, indent=4, ensure_ascii=False)
 
-        
 
+    if GraphSAGE:
+        from customers.targeting.graphSAGE.inference import GraphSAGERecommender
+        recommender = GraphSAGERecommender()
+        ALL_REC: bool = True
+        if ALL_REC:
+            # TODO: Get recommednations for all msisdns we have.
+            from customers.targeting.graphSAGE.config import ArtifactConfig
+            artifact_config = ArtifactConfig()
+            artifact_config.REC_OUT.mkdir(parents=True, exist_ok=True)
 
+            out_path = artifact_config.REC_OUT / "graphsage_all_recommendations.csv"
+
+            recommender.export_all_recommendations(
+                out_path=out_path,
+                top_k=10,
+                user_chunk_size=4096,
+                exclude_seen=False,
+            )
+
+            print(f"Saved recommendations to: {out_path}")
+            
+  
+        else:
+            # One known MSISDN
+            print(
+                recommender.recommend_for_msisdn(
+                    msisdn="242061000000",
+                    top_k=10,
+                    exclude_seen=True,
+                )
+            )
+
+            # Many MSISDNs, faster because it scores users in chunks
+            print(
+                recommender.recommend_for_msisdns(
+                    msisdns=[
+                        "242061000000",
+                        "242061000303"
+                    ],
+                    top_k=10,
+                    exclude_seen=True,
+                    include_cold_start=True,
+                    user_chunk_size=50,
+                )
+            )
+            # Direct cold-start fallback
+            result = recommender.recommend_cold_start(
+                msisdn="NEW_MSISDN_123",
+                top_k=10,
+                service_class_category="PREPAID",
+                canal="APP",
+                payment_mode="PREPAID",
+                department_city="BRAZZAVILLE",
+                brand_name="Apple",
+                device_capability="4G",
+                bundle_type="BUNDLE_DATA",
+                max_price=1000,
+            )
+
+            print(result)

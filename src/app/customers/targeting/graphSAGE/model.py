@@ -13,6 +13,14 @@ from src.app.customers.targeting.graphSAGE.config import EDGE_TYPE, REV_EDGE_TYP
 class TabEncoder(nn.Module):
 
     def __init__(self, num_dim, cat_cardinalities, hidden_dim, cat_emb_dim=16):
+        """
+        - TabEncoder will convert numerical tensor + categorical tensor to embeddings.
+        Args:
+            num_dim: Number of node's features
+            cat_cardinalities: dict containing number of unique values for each categorical feature
+            hidden_dim: Final embedding size
+            cat_emb_dim: Maximum embedding size for categorical features. Defaults to 16.
+        """
         super().__init__()
         self.embs = nn.ModuleList()
 

@@ -12,9 +12,9 @@ import {
 const navLinks = [
   { name: 'Executive Dashboard', path: '/', icon: HomeIcon },
   { name: 'AI Bundle Studio', path: '/bundle', icon: CubeTransparentIcon },
-  { name: 'AI Pricing', path: '/pricing', icon: BoltIcon },
-  { name: 'Campaign Simulation', path: '/campaign', icon: CursorArrowRaysIcon },
+  { name: 'Dynamic Pricing', path: '/pricing', icon: BoltIcon },
   { name: 'Targeting & Personalization', path: '/targeting', icon: UserGroupIcon },
+  { name: 'Campaign Simulation', path: '/campaign', icon: CursorArrowRaysIcon },
   { name: 'Forecasting & Analytics', path: '/forecast', icon: PresentationChartBarIcon },
 ]
 

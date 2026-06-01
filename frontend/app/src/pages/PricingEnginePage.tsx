@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
+import type { EChartsOption, SeriesOption } from 'echarts'
+import ReactECharts from 'echarts-for-react'
 import { ArrowPathIcon, CalculatorIcon, CurrencyDollarIcon } from '@heroicons/react/24/outline'
 import { ErrorState, LoadingState } from '../components/ui/StateMessage'
 
@@ -59,6 +61,81 @@ type PriceLookupResponse = {
 
 type ConfigResponse = {
   config: PricingConfig
+}
+
+type ChartTooltipParam = {
+  seriesName?: string
+  marker?: string
+  value?: [number, number, number | null, string | null]
+}
+
+type PlotlyChartTrace = {
+  type?: string
+  mode?: string
+  name?: string
+  x?: number[]
+  y?: number[]
+  text?: string[]
+  textposition?: string
+  showlegend?: boolean
+  line?: {
+    color?: string
+    width?: number
+    dash?: string
+  }
+  marker?: {
+    color?: string
+    size?: number
+    symbol?: string
+    line?: {
+      color?: string
+      width?: number
+    }
+  }
+  customdata?: Array<[number, string]>
+}
+
+type PlotlyChartShape = {
+  type?: string
+  xref?: string
+  yref?: string
+  x0?: number
+  x1?: number
+  y0?: number
+  y1?: number
+  opacity?: number
+  line?: {
+    color?: string
+    width?: number
+    dash?: string
+  }
+}
+
+type PlotlyChartAnnotation = {
+  text?: string
+  y?: number
+}
+
+type PlotlyChartLayout = {
+  title?: string | { text?: string }
+  xaxis?: { title?: string | { text?: string } }
+  yaxis?: { title?: string | { text?: string } }
+  shapes?: PlotlyChartShape[]
+  annotations?: PlotlyChartAnnotation[]
+}
+
+type PricingVisualizationChart = {
+  service: ServiceKey
+  data: PlotlyChartTrace[]
+  layout: PlotlyChartLayout
+  meta?: {
+    unit_name?: string
+    floor_rate?: number
+  }
+}
+
+type PricingVisualizationResponse = {
+  charts: Partial<Record<ServiceKey, PricingVisualizationChart>>
 }
 
 type BundleFormState = {
@@ -304,6 +381,279 @@ const recalculateDecay = (
   return -numerator / denominator
 }
 
+const formatChartNumber = (value: number) =>
+  new Intl.NumberFormat('en-US', {
+    maximumFractionDigits: value >= 100 ? 0 : 4,
+  }).format(value)
+
+const stripChartHtml = (value: string) =>
+  value
+    .replace(/<br\s*\/?>/gi, ' - ')
+    .replace(/<[^>]*>/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+
+const getPlotlyTitleText = (title: string | { text?: string } | undefined) => {
+  if (typeof title === 'string') {
+    return stripChartHtml(title)
+  }
+
+  return stripChartHtml(title?.text ?? '')
+}
+
+const normalizeCurrencyLabel = (value: string) => value.replaceAll('NGN', 'Fr')
+
+const getAxisTitleText = (axis: { title?: string | { text?: string } } | undefined) => {
+  const title = axis?.title
+  const text = typeof title === 'string' ? title : title?.text ?? ''
+
+  return normalizeCurrencyLabel(stripChartHtml(text))
+}
+
+const toEChartsLineType = (dash?: string): 'solid' | 'dashed' | 'dotted' => {
+  if (dash === 'dash') {
+    return 'dashed'
+  }
+
+  if (dash === 'dot') {
+    return 'dotted'
+  }
+
+  return 'solid'
+}
+
+const toEChartsSymbol = (symbol?: string) => {
+  if (symbol === 'diamond') {
+    return 'diamond'
+  }
+
+  return 'circle'
+}
+
+const formatPricingTooltip = (params: unknown) => {
+  const items = Array.isArray(params) ? (params as ChartTooltipParam[]) : [params as ChartTooltipParam]
+
+  return items
+    .filter((item) => Array.isArray(item.value))
+    .map((item) => {
+      const [price, rate, vpm, rule] = item.value ?? [0, 0, null, null]
+
+      const lines = [
+        `<strong>${item.marker ?? ''}${item.seriesName ?? ''}</strong>`,
+        `Price: Fr ${formatChartNumber(price)}`,
+        `Effective rate: ${formatChartNumber(rate)}`,
+      ]
+
+      if (typeof vpm === 'number') {
+        lines.push(`Validity multiplier: ${vpm.toFixed(2)}x`)
+      }
+
+      if (rule) {
+        lines.push(`Rule: ${rule}`)
+      }
+
+      return lines.join('<br />')
+    })
+    .join('<br /><br />')
+}
+
+const buildTraceSeries = (trace: PlotlyChartTrace): SeriesOption | null => {
+  const prices = trace.x ?? []
+  const rates = trace.y ?? []
+
+  if (prices.length === 0 || rates.length === 0) {
+    return null
+  }
+
+  const data = prices.map((price, index) => {
+    const custom = trace.customdata?.[index]
+
+    return [price, rates[index], custom?.[0] ?? null, custom?.[1] ?? null]
+  })
+
+  if (trace.mode?.includes('lines')) {
+    return {
+      name: trace.name,
+      type: 'line',
+      smooth: true,
+      showSymbol: false,
+      data,
+      lineStyle: {
+        color: trace.line?.color,
+        width: trace.line?.width ?? 3,
+        type: toEChartsLineType(trace.line?.dash),
+      },
+      itemStyle: { color: trace.line?.color },
+      emphasis: { focus: 'series' },
+    }
+  }
+
+  return {
+    name: trace.showlegend === false ? undefined : trace.name,
+    type: 'scatter',
+    symbol: toEChartsSymbol(trace.marker?.symbol),
+    symbolSize: trace.marker?.size ?? 9,
+    data,
+    itemStyle: {
+      color: trace.marker?.color,
+      borderColor: trace.marker?.line?.color,
+      borderWidth: trace.marker?.line?.width,
+    },
+    label: trace.text?.length
+      ? {
+          show: true,
+          formatter: ({ dataIndex }: { dataIndex: number }) => trace.text?.[dataIndex] ?? '',
+          position: 'top',
+          color: '#153f3b',
+          fontSize: 11,
+          fontWeight: 600,
+        }
+      : undefined,
+  }
+}
+
+const buildShapeGuideSeries = (chart: PricingVisualizationChart): SeriesOption[] =>
+  (chart.layout.shapes ?? [])
+    .map<SeriesOption | null>((shape) => {
+      if (shape.type !== 'line') {
+        return null
+      }
+
+      const isVertical = shape.x0 === shape.x1 && typeof shape.x0 === 'number'
+      const isHorizontal = shape.y0 === shape.y1 && typeof shape.y0 === 'number'
+
+      if (!isVertical && !isHorizontal) {
+        return null
+      }
+
+      const annotation = isHorizontal
+        ? chart.layout.annotations?.find((item) => item.y === shape.y0)
+        : undefined
+
+      return {
+        name: undefined,
+        type: 'scatter',
+        data: [],
+        silent: true,
+        symbolSize: 0,
+        markLine: {
+          symbol: 'none',
+          label: {
+            show: Boolean(annotation?.text),
+            formatter: annotation?.text,
+            color: '#153f3b',
+            fontSize: 11,
+            fontWeight: 600,
+          },
+          lineStyle: {
+            color: shape.line?.color ?? '#111827',
+            width: shape.line?.width ?? 1,
+            type: toEChartsLineType(shape.line?.dash),
+            opacity: shape.opacity ?? 1,
+          },
+          data: [isVertical ? { xAxis: shape.x0 } : { yAxis: shape.y0 }],
+        },
+      }
+    })
+    .filter((item): item is SeriesOption => item !== null)
+
+const buildPricingChartOption = (chart: PricingVisualizationChart): EChartsOption => {
+  const traceSeries = chart.data
+    .map(buildTraceSeries)
+    .filter((item): item is SeriesOption => item !== null)
+  const shapeSeries = buildShapeGuideSeries(chart)
+  const titleText = getPlotlyTitleText(chart.layout.title).split(' - ')[0]
+
+  return {
+    backgroundColor: 'transparent',
+    title: {
+      text: titleText || `${SERVICE_LABELS[chart.service]} Pricing Algorithm Curve`,
+      subtext: 'Solid = interpolation | Dashed = decay | Dots = anchor points | Dashed guide = floor',
+      left: 0,
+      top: 0,
+      textStyle: {
+        color: '#134e4a',
+        fontSize: 18,
+        fontWeight: 700,
+      },
+      subtextStyle: {
+        color: '#5f7f7a',
+        fontSize: 12,
+      },
+    },
+    grid: {
+      top: 100,
+      right: 34,
+      bottom: 78,
+      left: 60,
+      containLabel: true,
+    },
+    legend: {
+      type: 'scroll',
+      top: 48,
+      left: 0,
+      right: 0,
+      itemWidth: 18,
+      itemHeight: 10,
+      textStyle: {
+        color: '#315c57',
+        fontSize: 11,
+      },
+    },
+    tooltip: {
+      trigger: 'item',
+      formatter: formatPricingTooltip,
+      confine: true,
+      borderColor: '#ccfbf1',
+      backgroundColor: 'rgba(255, 255, 255, 0.96)',
+      textStyle: {
+        color: '#153f3b',
+      },
+    },
+    xAxis: {
+      type: 'value',
+      name: getAxisTitleText(chart.layout.xaxis),
+      nameLocation: 'middle',
+      nameGap: 34,
+      axisLine: { lineStyle: { color: '#9bbab5' } },
+      axisLabel: {
+        color: '#4f6f6a',
+        formatter: (value: number) => formatChartNumber(value),
+      },
+      splitLine: { lineStyle: { color: '#eef7f5' } },
+    },
+    yAxis: {
+      type: 'value',
+      name: getAxisTitleText(chart.layout.yaxis),
+      nameLocation: 'middle',
+      nameGap: 52,
+      axisLine: { lineStyle: { color: '#9bbab5' } },
+      axisLabel: {
+        color: '#4f6f6a',
+      },
+      splitLine: { lineStyle: { color: '#eef7f5' } },
+    },
+    dataZoom: [
+      {
+        type: 'inside',
+        xAxisIndex: 0,
+        filterMode: 'none',
+      },
+      {
+        type: 'slider',
+        height: 18,
+        bottom: 18,
+        borderColor: '#d9efeb',
+        fillerColor: 'rgba(20, 184, 166, 0.18)',
+        handleStyle: {
+          color: '#0f766e',
+        },
+      },
+    ],
+    series: [...traceSeries, ...shapeSeries],
+  }
+}
+
 const parsePositiveNumberMap = (values: Record<ServiceKey, string>) =>
   (Object.entries(values) as Array<[ServiceKey, string]>).reduce<Partial<Record<ServiceKey, number>>>(
     (acc, [service, value]) => {
@@ -353,6 +703,10 @@ const PricingEnginePage = () => {
   const [lookupError, setLookupError] = useState<string | null>(null)
   const [lookupLoading, setLookupLoading] = useState(false)
 
+  const [visualizationCharts, setVisualizationCharts] = useState<Partial<Record<ServiceKey, PricingVisualizationChart>>>({})
+  const [visualizationError, setVisualizationError] = useState<string | null>(null)
+  const [visualizationLoading, setVisualizationLoading] = useState(true)
+
   useEffect(() => {
     let isMounted = true
 
@@ -384,6 +738,43 @@ const PricingEnginePage = () => {
     }
 
     void loadConfig()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
+  useEffect(() => {
+    let isMounted = true
+
+    const loadVisualizations = async () => {
+      setVisualizationLoading(true)
+      setVisualizationError(null)
+
+      try {
+        const { data } = await axios.get<PricingVisualizationResponse>(
+          `${API_BASE_URL}/pricing/visualization?n_points=400`,
+        )
+
+        if (!isMounted) {
+          return
+        }
+
+        setVisualizationCharts(data.charts)
+      } catch (error) {
+        if (!isMounted) {
+          return
+        }
+
+        setVisualizationError(getErrorMessage(error))
+      } finally {
+        if (isMounted) {
+          setVisualizationLoading(false)
+        }
+      }
+    }
+
+    void loadVisualizations()
 
     return () => {
       isMounted = false
@@ -478,6 +869,25 @@ const PricingEnginePage = () => {
 
     return Object.values(allocations).reduce((sum, value) => sum + value, 0)
   }, [bundleForm])
+
+  const pricingChartOptions = useMemo(
+    () =>
+      (['voice', 'data', 'sms'] as ServiceKey[])
+        .map((service) => {
+          const chart = visualizationCharts[service]
+
+          if (!chart) {
+            return null
+          }
+
+          return {
+            service,
+            option: buildPricingChartOption(chart),
+          }
+        })
+        .filter((item): item is { service: ServiceKey; option: EChartsOption } => item !== null),
+    [visualizationCharts],
+  )
 
   const updateBundleField = <K extends keyof BundleFormState>(field: K, value: BundleFormState[K]) => {
     setBundleForm((current) => ({ ...current, [field]: value }))
@@ -963,6 +1373,34 @@ const PricingEnginePage = () => {
           </div>
         </form>
       </div>
+
+      <section className="space-y-5 rounded-[2rem] border border-minteal-100 bg-white/90 p-6 shadow-sm">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-[0.3em] text-minteal-400">Visualization</p>
+            <h3 className="mt-2 text-2xl font-semibold text-minteal-900">Pricing algorithm curves</h3>
+          </div>
+          <p className="text-sm font-medium text-minteal-500">
+            {visualizationLoading ? 'Loading chart data from /pricing/visualization...' : 'API chart data'}
+          </p>
+        </div>
+
+        {visualizationLoading ? <LoadingState message="Loading pricing visualization data" /> : null}
+        {!visualizationLoading && visualizationError ? <ErrorState message={visualizationError} /> : null}
+
+        {!visualizationLoading && !visualizationError ? (
+          <div className="grid gap-6 xl:grid-cols-2">
+            {pricingChartOptions.map(({ service, option }) => (
+              <article
+                key={service}
+                className="overflow-hidden rounded-3xl border border-minteal-100 bg-gradient-to-br from-white via-white to-minteal-50/70 p-5 shadow-sm shadow-minteal-900/5"
+              >
+                <ReactECharts option={option} notMerge lazyUpdate style={{ height: 500, width: '100%' }} />
+              </article>
+            ))}
+          </div>
+        ) : null}
+      </section>
 
       <section className="space-y-6 rounded-[2rem] border border-minteal-100 bg-white/90 p-6 shadow-sm">
         <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">

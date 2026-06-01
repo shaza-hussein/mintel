@@ -1389,13 +1389,13 @@ const PricingEnginePage = () => {
         {!visualizationLoading && visualizationError ? <ErrorState message={visualizationError} /> : null}
 
         {!visualizationLoading && !visualizationError ? (
-          <div className="grid gap-6 xl:grid-cols-2">
+          <div className="grid gap-6">
             {pricingChartOptions.map(({ service, option }) => (
               <article
                 key={service}
-                className="overflow-hidden rounded-3xl border border-minteal-100 bg-gradient-to-br from-white via-white to-minteal-50/70 p-5 shadow-sm shadow-minteal-900/5"
+                className="w-full overflow-hidden rounded-3xl border border-minteal-100 bg-gradient-to-br from-white via-white to-minteal-50/70 p-5 shadow-sm shadow-minteal-900/5"
               >
-                <ReactECharts option={option} notMerge lazyUpdate style={{ height: 500, width: '100%' }} />
+                <ReactECharts option={option} notMerge lazyUpdate style={{ height: 560, width: '100%' }} />
               </article>
             ))}
           </div>

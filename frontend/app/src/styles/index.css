@@ -2,11 +2,109 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  color-scheme: light;
+}
+
+:root.dark {
+  color-scheme: dark;
+}
+
 body {
   @apply m-0 bg-minteal-50 text-minteal-900 font-sans antialiased;
   min-height: 100vh;
 }
 
+:root.dark body {
+  background: #071313;
+  color: #dbe5e5;
+}
+
 #root {
   min-height: 100vh;
+}
+
+:root.dark [class~="bg-white"],
+:root.dark [class~="bg-white/70"],
+:root.dark [class~="bg-white/80"],
+:root.dark [class~="bg-white/82"],
+:root.dark [class~="bg-white/88"],
+:root.dark [class~="bg-white/90"],
+:root.dark [class~="bg-white/92"],
+:root.dark [class~="bg-white/95"] {
+  background-color: rgba(18, 36, 36, 0.9);
+}
+
+:root.dark [class~="bg-minteal-50"],
+:root.dark [class~="bg-minteal-50/60"],
+:root.dark [class~="bg-minteal-50/70"],
+:root.dark [class~="bg-minteal-50/75"],
+:root.dark [class~="bg-minteal-50/80"] {
+  background-color: rgba(11, 26, 26, 0.9);
+}
+
+:root.dark [class~="bg-minteal-100"] {
+  background-color: rgba(28, 64, 64, 0.88);
+}
+
+:root.dark [class~="border-minteal-100"],
+:root.dark [class~="border-minteal-200"] {
+  border-color: rgba(111, 159, 156, 0.24);
+}
+
+:root.dark [class~="border-white/70"],
+:root.dark [class~="border-white/10"] {
+  border-color: rgba(219, 229, 229, 0.14);
+}
+
+:root.dark [class~="text-minteal-950"],
+:root.dark [class~="text-minteal-900"],
+:root.dark [class~="text-minteal-800"],
+:root.dark [class~="text-minteal-700"] {
+  color: #e7f0f0;
+}
+
+:root.dark [class~="text-minteal-600"],
+:root.dark [class~="text-minteal-500"],
+:root.dark [class~="text-minteal-400"] {
+  color: #a7c3c1;
+}
+
+:root.dark [class~="text-minteal-300"],
+:root.dark [class~="text-minteal-200"] {
+  color: #c8dada;
+}
+
+:root.dark [class~="from-white"],
+:root.dark [class~="from-white/70"] {
+  --tw-gradient-from: rgba(8, 19, 19, 0.98) var(--tw-gradient-from-position);
+  --tw-gradient-to: rgba(8, 19, 19, 0) var(--tw-gradient-to-position);
+}
+
+:root.dark [class~="via-white"] {
+  --tw-gradient-to: rgba(18, 36, 36, 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), rgba(18, 36, 36, 0.94) var(--tw-gradient-via-position), var(--tw-gradient-to);
+}
+
+:root.dark [class~="to-minteal-50"],
+:root.dark [class~="to-minteal-50/70"] {
+  --tw-gradient-to: rgba(7, 19, 19, 0.98) var(--tw-gradient-to-position);
+}
+
+:root.dark [class*="bg-[linear-gradient"],
+:root.dark [class*="bg-[radial-gradient"] {
+  background-image: linear-gradient(135deg, rgba(8, 19, 19, 0.98), rgba(17, 48, 48, 0.92));
+}
+
+:root.dark input,
+:root.dark select,
+:root.dark textarea {
+  background-color: rgba(9, 24, 24, 0.96);
+  border-color: rgba(111, 159, 156, 0.32);
+  color: #e7f0f0;
+}
+
+:root.dark input::placeholder,
+:root.dark textarea::placeholder {
+  color: #6f9f9c;
 }

@@ -1,4 +1,5 @@
 ﻿import type { ReactNode } from 'react'
+import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import {
   HomeIcon,
@@ -7,6 +8,8 @@ import {
   CursorArrowRaysIcon,
   UserGroupIcon,
   PresentationChartBarIcon,
+  MoonIcon,
+  SunIcon,
 } from '@heroicons/react/24/outline'
 
 const navLinks = [
@@ -18,7 +21,27 @@ const navLinks = [
   { name: 'Forecasting & Analytics', path: '/forecast', icon: PresentationChartBarIcon },
 ]
 
+type ThemeMode = 'light' | 'dark'
+
+const getInitialTheme = (): ThemeMode => {
+  const storedTheme = window.localStorage.getItem('mintel-theme')
+
+  if (storedTheme === 'light' || storedTheme === 'dark') {
+    return storedTheme
+  }
+
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+}
+
 const DashboardShell = ({ children }: { children: ReactNode }) => {
+  const [theme, setTheme] = useState<ThemeMode>(getInitialTheme)
+  const isDark = theme === 'dark'
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', isDark)
+    window.localStorage.setItem('mintel-theme', theme)
+  }, [isDark, theme])
+
   return (
     <div className="min-h-screen bg-minteal-50 text-minteal-900">
       <div className="flex h-screen">
@@ -57,6 +80,16 @@ const DashboardShell = ({ children }: { children: ReactNode }) => {
                 <h2 className="text-xl font-semibold text-minteal-900">Operational scenario: Fusion Tone</h2>
               </div>
               <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+                  title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+                  onClick={() => setTheme(isDark ? 'light' : 'dark')}
+                  className="inline-flex items-center gap-2 rounded-full border border-minteal-200 bg-white/80 px-4 py-2 text-sm font-medium text-minteal-600 shadow-sm transition hover:border-minteal-400"
+                >
+                  {isDark ? <SunIcon className="h-4 w-4" /> : <MoonIcon className="h-4 w-4" />}
+                  {isDark ? 'Light' : 'Dark'}
+                </button>
                 <button className="rounded-full border border-minteal-200 px-4 py-2 text-sm font-medium text-minteal-600 hover:border-minteal-400">
                   Scenario Compare
                 </button>

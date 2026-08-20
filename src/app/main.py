@@ -13,7 +13,7 @@ if TRAIN:
     trainer = ProductModelsTrainer()
 
     # TODO-1-: Train ML Popularity Model
-    data = pd.read_csv(r"..\..\..\datasets\weekly_base_bundles_info_202501_202510.csv")
+    data = pd.read_csv(r"data\weekly_base_bundles_info_202501_202510.csv")
     df_model = trainer.train_popularity(data=data)
 
     del data

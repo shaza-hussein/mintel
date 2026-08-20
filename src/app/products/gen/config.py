@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Tuple
 
-PROJECT_ROOT = Path(__file__).resolve().parents[5]
+PROJECT_ROOT = Path(__file__).resolve().parents[4]
 
 _ALLOWED_OFFER_TYPES = {
     "atl",
@@ -27,7 +27,7 @@ _OFFER_TYPE_ALIASES = {
 
 @dataclass(frozen=True)
 class DataConfig:
-    dataset_folder: Path = PROJECT_ROOT / "datasets"
+    dataset_folder: Path = PROJECT_ROOT / "data"
     weekly_bundles_filename: str = "weekly_base_bundles_info_202501_202510.csv"
 
     @property

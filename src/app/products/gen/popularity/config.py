@@ -6,10 +6,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Tuple
 
+PROJECT_ROOT = Path(__file__).resolve().parents[5]
+
 
 @dataclass(frozen=True)
 class DataConfig:
-    dataset_folder: Path = Path(r"..\..\..\..\..\..\datasets")
+    dataset_folder: Path = PROJECT_ROOT / "data"
     weekly_bundles_filename: str = "weekly_base_bundles_info_202501_202510.csv"
 
     @property
@@ -39,8 +41,6 @@ class ModelConfig:
         "validity_bucket",
     )
 
-
-PROJECT_ROOT = Path(__file__).resolve().parents[5]
 
 @dataclass(frozen=True)
 class ArtifactConfig:

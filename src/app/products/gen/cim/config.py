@@ -7,12 +7,12 @@ from dataclasses import dataclass, field
 
 @dataclass
 class ModelParams:
-    growth_rate: float            = 0.03
+    growth_rate: float            = 0.003
     cannib_sensitivity: float     = 0.5
-    price_elasticity: float       = 1.50
+    price_elasticity: float       = 1.50 
     similarity_threshold: float   = 0.05
-    cannib_cap: float             = 0.25
-    expected_new_market_pct: float = 0.5
+    cannib_cap: float             = 0.25 # capacity: No bundle can lose more than 25% 
+    expected_new_market_pct: float = 0.2
     feature_weights: dict = field(default_factory=lambda: {
         "volume_mb":    1.0,
         "minutes":      1.0,

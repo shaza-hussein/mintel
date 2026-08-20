@@ -7,6 +7,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.api.routers.pricing import router as pricing_router
 from src.api.routers.mba import router as mba_router
 from src.api.routers.generator import router as generator_router
+from src.api.routers.graphsage.recommendations import router as graph_rec_router
+from src.api.routers.graphsage.graph import router as graph_vis_router
+from src.api.routers.graphsage.coldstart import router as graph_coldstart_router
+
 
 app = FastAPI(
     title="MinTel",
@@ -24,3 +28,6 @@ app.add_middleware(
 app.include_router(pricing_router)
 app.include_router(mba_router)
 app.include_router(generator_router)
+app.include_router(graph_rec_router)
+app.include_router(graph_vis_router)
+app.include_router(graph_coldstart_router)

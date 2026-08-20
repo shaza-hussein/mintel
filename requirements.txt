@@ -24,3 +24,12 @@ ctgan==0.12.1
 pyspark==4.1.1
 dotenv
 pydantic_settings
+torch_geometric==2.7.0
+duckdb==1.5.2
+pyvis
+jinja2
+
+# install pytroch with cuda
+# pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128  
+# install for torch geometric
+# pip install pyg-lib torch-sparse -f https://data.pyg.org/whl/torch-2.11.0+cu128.html

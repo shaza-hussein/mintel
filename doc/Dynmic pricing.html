@@ -1,0 +1,1561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Pricing Algorithm - Stanford Math & AI Lecture</title>
+    
+    <!-- MathJax Configuration -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)'], ['$$', '$$'], ['\\[', '\\]']], 
+                displayMath: []
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: rgba(25, 25, 35, 0.6);
+            --text-primary: #e4e4e7;
+            --text-secondary: #a1a1aa;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-cyan: #06b6d4;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --glow-color: rgba(59, 130, 246, 0.15);
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+        
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(ellipse at 15% 10%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 85% 90%, rgba(139, 92, 246, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(6, 182, 212, 0.04) 0%, transparent 60%);
+            animation: bgShift 20s ease-in-out infinite alternate;
+        }
+        
+        @keyframes bgShift {
+            0% { transform: scale(1) rotate(0deg); }
+            100% { transform: scale(1.1) rotate(2deg); }
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 32px;
+        }
+        
+        /* Hero Section */
+        .hero {
+            padding: 120px 0 80px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 50px;
+            padding: 8px 20px;
+            font-size: 0.85rem;
+            color: var(--accent-cyan);
+            margin-bottom: 32px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .hero-badge::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--accent-cyan);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+        
+        h1 {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #fff 0%, var(--accent-blue) 50%, var(--accent-purple) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto 40px;
+            font-weight: 400;
+        }
+        
+        .hero-meta {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            flex-wrap: wrap;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .meta-item strong {
+            color: var(--text-primary);
+        }
+        
+        /* Section Styles */
+        section {
+            padding: 60px 0;
+            position: relative;
+        }
+        
+        .section-header {
+            margin-bottom: 48px;
+        }
+        
+        h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+            position: relative;
+            display: inline-block;
+        }
+        
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+            border-radius: 2px;
+        }
+        
+        h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin: 36px 0 16px;
+            color: var(--text-primary);
+        }
+        
+        h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 24px 0 12px;
+            color: var(--accent-cyan);
+        }
+        
+        p {
+            margin-bottom: 1.5em;
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+        }
+        
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            margin: 24px 0;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            border-color: rgba(59, 130, 246, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card-highlight {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border-color: rgba(59, 130, 246, 0.2);
+        }
+        
+        /* Formula Box */
+        .formula-box {
+            background: rgba(15, 15, 25, 0.8);
+            border-left: 4px solid var(--accent-blue);
+            border-radius: 8px;
+            padding: 24px 28px;
+            margin: 28px 0;
+            font-family: 'JetBrains Mono', monospace;
+            overflow-x: auto;
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .formula-box.large {
+            font-size: 1.15rem;
+            text-align: center;
+            border-left: none;
+            border-top: 4px solid var(--accent-blue);
+        }
+        
+        /* Code Blocks */
+        pre {
+            background: rgba(10, 10, 18, 0.95);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            overflow-x: auto;
+            margin: 24px 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
+        
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent-cyan);
+        }
+        
+        pre code {
+            color: var(--text-secondary);
+        }
+        
+        pre code .keyword { color: #c792ea; }
+        pre code .function { color: #82aaff; }
+        pre code .string { color: #c3e88d; }
+        pre code .comment { color: #546e7a; }
+        pre code .number { color: #f78c6c; }
+        
+        /* Tables */
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 28px 0;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+        
+        th {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            font-weight: 600;
+            padding: 16px;
+            text-align: left;
+            border-bottom: 2px solid var(--accent-blue);
+        }
+        
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+        
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        
+        /* Lists */
+        ul, ol {
+            margin: 16px 0 24px 24px;
+            color: var(--text-secondary);
+        }
+        
+        li {
+            margin: 10px 0;
+            line-height: 1.7;
+        }
+        
+        li strong {
+            color: var(--text-primary);
+        }
+        
+        /* Grid Layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            margin: 28px 0;
+        }
+        
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 28px 0;
+        }
+        
+        /* Feature Items */
+        .feature-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s ease;
+        }
+        
+        .feature-item:hover {
+            border-color: var(--accent-purple);
+            transform: translateY(-4px);
+        }
+        
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            margin-bottom: 16px;
+        }
+        
+        .feature-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+        
+        .feature-desc {
+            font-size: 0.92rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        /* Algorithm Box */
+        .algorithm-box {
+            background: linear-gradient(180deg, rgba(20, 20, 30, 0.95) 0%, rgba(15, 15, 22, 0.98) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            margin: 32px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .algorithm-box::before {
+            content: 'ALGORITHM';
+            position: absolute;
+            top: 16px;
+            right: 20px;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            color: var(--accent-blue);
+            opacity: 0.6;
+        }
+        
+        .algorithm-steps {
+            counter-reset: step;
+        }
+        
+        .algorithm-step {
+            counter-increment: step;
+            position: relative;
+            padding-left: 48px;
+            margin: 20px 0;
+        }
+        
+        .algorithm-step::before {
+            content: counter(step);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+        
+        /* Example Box */
+        .example-box {
+            background: rgba(6, 182, 212, 0.05);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            border-radius: 12px;
+            padding: 28px;
+            margin: 28px 0;
+        }
+        
+        .example-label {
+            display: inline-block;
+            background: rgba(6, 182, 212, 0.15);
+            color: var(--accent-cyan);
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+        }
+        
+        /* Section Divider */
+        .section-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border-color), transparent);
+            margin: 80px 0;
+        }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 60px 0 40px;
+            border-top: 1px solid var(--border-color);
+            margin-top: 80px;
+        }
+        
+        footer p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 20px;
+            }
+            
+            .hero {
+                padding: 80px 0 60px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            h2 {
+                font-size: 1.6rem;
+            }
+            
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+            
+            .card {
+                padding: 24px;
+            }
+            
+            .hero-meta {
+                flex-direction: column;
+                gap: 12px;
+            }
+        }
+        
+        /* Smooth Scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Selection */
+        ::selection {
+            background: rgba(59, 130, 246, 0.3);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+    
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="container">
+            <div class="hero-badge">STANFORD CS-MATH LECTURE SERIES</div>
+            <h1>Dynamic Pricing Algorithm<br>A Comprehensive Mathematical Analysis</h1>
+            <p class="hero-subtitle">Deep dive into the mathematics behind production-grade dynamic pricing systems used in telecommunications revenue optimization — covering exponential decay models, piecewise interpolation, numerical methods, and multiplicative discount architectures.</p>
+            <div class="hero-meta">
+                <div class="meta-item">
+                    <span>📚</span>
+                    <span>Course: <strong>Advanced Algorithms in Revenue Optimization</strong></span>
+                </div>
+                <div class="meta-item">
+                    <span>🎓</span>
+                    <span>Department: <strong>Mathematics & AI Engineering</strong></span>
+                </div>
+                <div class="meta-item">
+                    <span>📍</span>
+                    <span><strong>Stanford University</strong></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Part 1: Mathematical Foundation -->
+        <section id="part1">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Part 1: Mathematical Foundation</h2>
+                </div>
+                
+                <h3>1.1 Core Problem Statement</h3>
+                <p>At the heart of any dynamic pricing system lies a fundamental mapping problem. Given a <strong>price point</strong> $P$ for a service (whether voice minutes, data megabytes, or SMS messages), we must determine the <strong>volume</strong> $V$ of units a customer receives:</p>
+                
+                <div class="formula-box large">
+                    $f: P \mapsto V$
+                </div>
+                
+                <p>The mathematical challenge here is substantial: this function is <strong>non-linear</strong>, <strong>piecewise-defined</strong>, and must simultaneously incorporate multiple business constraints including validity periods, promotional discounts, and bundle economics.</p>
+                
+                <h3>1.2 The Effective Rate Model</h3>
+                <p>The central innovation of this pricing engine is the concept of an <strong>Effective Rate (ER)</strong> — representing the price per unit at any given price point. This abstraction allows us to decompose complex pricing logic into manageable components:</p>
+                
+                <div class="formula-box large">
+                    $ER(P) = \frac{P}{V(P)} \quad \implies \quad V(P) = \frac{P}{ER(P)}$
+                </div>
+                
+                <div class="card card-highlight">
+                    <h4>Exponential Decay Pattern</h4>
+                    <p>The effective rate follows a carefully calibrated <strong>exponential decay</strong> pattern that captures the economic reality of diminishing marginal utility:</p>
+                    <div class="formula-box large">
+                        $ER(P) = r_{floor} + (r_{anchor} - r_{floor}) \cdot e^{-k(P - P_{anchor})}$
+                    </div>
+                </div>
+                
+                <div class="grid-3">
+                    <div class="feature-item">
+                        <div class="feature-icon">$P_{anchor}$</div>
+                        <div class="feature-title">Anchor Price</div>
+                        <div class="feature-desc">Reference price point where the base rate is defined</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">$r_{anchor}$</div>
+                        <div class="feature-title">Anchor Rate</div>
+                        <div class="feature-desc">Price per unit at the anchor price point</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">$r_{floor}$</div>
+                        <div class="feature-title">Floor Rate</div>
+                        <div class="feature-desc">Asymptotic minimum rate as price increases</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">$k$</div>
+                        <div class="feature-title">Decay Constant</div>
+                        <div class="feature-desc">Controls steepness of the decay curve</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">$P_{max}$</div>
+                        <div class="feature-title">Maximum Price</div>
+                        <div class="feature-desc">Upper bound for price calculations</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">$\epsilon$</div>
+                        <div class="feature-title">Epsilon Tolerance</div>
+                        <div class="feature-desc">Small offset (0.01) ensuring numerical stability</div>
+                    </div>
+                </div>
+                
+                <h3>1.3 Derivation of the Decay Constant k</h3>
+                <p>To fully specify our exponential model, we must derive the decay constant $k$ from boundary conditions. From the configuration parameters, we establish three critical constraints:</p>
+                
+                <ul>
+                    <li>At $P = P_{anchor}$: The effective rate equals $ER = r_{anchor}$</li>
+                    <li>As $P \to \infty$: The effective rate approaches its asymptote $ER \to r_{floor}$</li>
+                    <li>At $P = P_{max}$: We define $ER = r_{floor} + \epsilon$ where $\epsilon = 0.01$ ensures numerical behavior</li>
+                </ul>
+                
+                <p>Solving the exponential equation for $k$:</p>
+                
+                <div class="formula-box">
+                    $$\begin{aligned}
+                    r_{floor} + \epsilon &= r_{floor} + (r_{anchor} - r_{floor}) \cdot e^{-k(P_{max} - P_{anchor})} \\[10pt]
+                    \frac{\epsilon}{r_{anchor} - r_{floor}} &= e^{-k(P_{max} - P_{anchor})} \\[10pt]
+                    \ln\left(\frac{\epsilon}{r_{anchor} - r_{floor}}\right) &= -k(P_{max} - P_{anchor})
+                    \end{aligned}$$
+                </div>
+                
+                <div class="formula-box large">
+                    $\displaystyle k = -\frac{\ln\left(\frac{\epsilon}{r_{anchor} - r_{floor}}\right)}{P_{max} - P_{anchor}}$
+                </div>
+                
+                <div class="example-box">
+                    <div class="example-label">PYTHON IMPLEMENTATION</div>
+<pre><code><span class="keyword">@staticmethod</span>
+<span class="keyword">def</span> <span class="function">recalculate_decay</span>(anchor_price, anchor_rate, floor_rate, max_price):
+    <span class="comment"># Validate inputs to prevent undefined behavior</span>
+    <span class="keyword">if</span> anchor_rate <= floor_rate <span class="keyword">or</span> max_price <= anchor_price:
+        <span class="keyword">return</span> math.nan
+    
+    <span class="comment"># Define epsilon tolerance for numerical stability</span>
+    rate_at_max = floor_rate + <span class="number">0.01</span>
+    
+    <span class="comment"># Apply logarithmic derivation formula</span>
+    numerator = math.log(
+        (rate_at_max - floor_rate) / (anchor_rate - floor_rate)
+    )
+    denominator = max_price - anchor_price
+    
+    <span class="keyword">return</span> -numerator / denominator</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- Part 2: Piecewise Interpolation -->
+        <section id="part2">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Part 2: Piecewise Linear Interpolation</h2>
+                </div>
+                
+                <p>While the exponential decay model provides elegant theoretical foundations, real-world pricing systems require handling <strong>empirical data points</strong> that may not perfectly fit any parametric curve. This necessitates piecewise linear interpolation.</p>
+                
+                <h3>2.1 Mathematical Formulation</h3>
+                <p>Given a set of $n$ known data points $(x_1, y_1), (x_2, y_2), \ldots, (x_n, y_n)$ sorted by $x$-coordinate, for any query value $x$ we compute:</p>
+                
+                <div class="formula-box large">
+                    $y(x) = y_i + \frac{(y_{i+1} - y_i)}{(x_{i+1} - x_i)}(x - x_i) \quad \text{where } x_i \leq x < x_{i+1}$
+                </div>
+                
+                <h3>2.2 Boundary Condition Handling</h3>
+                <div class="grid-2">
+                    <div class="card">
+                        <h4>Left Extrapolation (x < x₁)</h4>
+                        <p>When the query falls below our lowest data point, we extrapolate using the slope between the first two points:</p>
+                        <div class="formula-box">
+                            $y(x) = y_1 + \frac{(y_2 - y_1)}{(x_2 - x_1)}(x - x_1)$
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h4>Right Saturation (x ≥ xₙ)</h4>
+                        <p>When the query exceeds our highest data point, we return the final known value (constant extrapolation):</p>
+                        <div class="formula-box">
+                            $y(x) = y_n$
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="example-box">
+                    <div class="example-label">INTERPOLATION ALGORITHM</div>
+<pre><code><span class="keyword">@staticmethod</span>
+<span class="keyword">def</span> <span class="function">interpolate</span>(x, points):
+    <span class="comment"># Handle left boundary: extrapolate using initial slope</span>
+    <span class="keyword">if</span> x < points[<span class="number">0</span>][<span class="number">0</span>]:
+        x1, y1 = points[<span class="number">0</span>]
+        x2, y2 = points[<span class="number">1</span>]
+        slope = (y2 - y1) / (x2 - x1) <span class="keyword">if</span> (x2 - x1) != <span class="number">0</span> <span class="keyword">else</span> <span class="number">0</span>
+        <span class="keyword">return</span> y1 + (x - x1) * slope
+    
+    <span class="comment"># Find containing interval via linear scan</span>
+    <span class="keyword">for</span> i <span class="keyword">in</span> range(len(points) - <span class="number">1</span>):
+        x1, y1 = points[i]
+        x2, y2 = points[i + <span class="number">1</span>]
+        <span class="keyword">if</span> x1 <= x < x2:
+            <span class="keyword">return</span> y1 + (x - x1) * (y2 - y1) / (x2 - x1)
+    
+    <span class="comment"># Right boundary: return last known value</span>
+    <span class="keyword">return</span> points[-<span class="number">1</span>][<span class="number">1</span>]</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- Part 3: Service-Specific Pricing -->
+        <section id="part3">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Part 3: Service-Specific Pricing Functions</h2>
+                </div>
+                
+                <p>The dynamic pricing engine implements distinct mathematical formulations for each service type, reflecting different consumption patterns and business requirements.</p>
+                
+                <h3>3.1 Voice Service — Dual Time-Horizon Model</h3>
+                <p>Voice pricing uniquely supports both <strong>daily</strong> and <strong>weekly</strong> validity periods, each with dedicated empirical data points:</p>
+                
+                <div class="card card-highlight">
+                    <h4>Daily Validity (validity ≠ 7 days)</h4>
+                    <div class="formula-box">
+                        $$ER_{voice}(P) = \begin{cases}
+                        \text{Interpolate}(P, \text{daily\_points}) \times VPM(d) & P \leq P_{last}^{daily} \\[10pt]
+                        \left[r_{floor} + (ER_{last}^{daily} - r_{floor}) \cdot e^{-k(P - P_{last}^{daily})}\right] \times VPM(d) & P > P_{last}^{daily}
+                        \end{cases}$$
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h4>Weekly Validity (validity = 7 days)</h4>
+                    <div class="formula-box">
+                        $$ER_{voice}(P) = \begin{cases}
+                        \text{Interpolate}(P, \text{weekly\_points}) & P \leq P_{last}^{weekly} \\[10pt]
+                        r_{floor} + (ER_{last}^{weekly} - r_{floor}) \cdot e^{-k(P - P_{last}^{weekly})} & P > P_{last}^{weekly}
+                        \end{cases}$$
+                    </div>
+                    <p style="margin-top: 16px;"><em>Note: Weekly rates already embed validity premiums internally, so no separate VPM multiplier is applied.</em></p>
+                </div>
+                
+                <h3>3.2 Data Service — Hybrid Anchor Transition</h3>
+                <p>Data pricing uses a hybrid approach where the anchor price serves as the transition point between interpolation and exponential decay:</p>
+                
+                <div class="formula-box large">
+                    $$ER_{data}(P) = \begin{cases}
+                    \text{Interpolate}(P, \text{daily\_points}) \times VPM(d) & P \leq P_{anchor} \\[10pt]
+                    \left[r_{floor} + (r_{anchor} - r_{floor}) \cdot e^{-k(P - P_{anchor})}\right] \times VPM(d) & P > P_{anchor}
+                    \end{cases}$$
+                </div>
+                
+                <h3>3.3 SMS Service — Pure Exponential Decay</h3>
+                <p>SMS uses the simplest formulation with pure exponential decay from the anchor point:</p>
+                
+                <div class="formula-box large">
+                    $ER_{sms}(P) = \left[r_{floor} + (r_{anchor} - r_{floor}) \cdot e^{-k(P - P_{anchor})}\right] \times VPM(d)$
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- Part 4: Validity Premium Multiplier -->
+        <section id="part4">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Part 4: Validity Premium Multiplier (VPM)</h2>
+                </div>
+                
+                <p>Longer validity periods represent greater value to customers and consequently command a <strong>premium</strong> on the effective rate. This is implemented through the Validity Period Multiplier.</p>
+                
+                <h3>4.1 Mathematical Definition</h3>
+                <div class="formula-box large">
+                    $VPM(d) = 1 + \frac{\text{Premium}(d)}{100}$
+                </div>
+                
+                <h3>4.2 Configured Premium Schedule</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Validity Period (days)</th>
+                                <th>Premium Percentage</th>
+                                <th>VPM Factor</th>
+                                <th>Economic Interpretation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>1</strong></td>
+                                <td>0%</td>
+                                <td>1.00</td>
+                                <td>Baseline (no premium)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>2</strong></td>
+                                <td>25%</td>
+                                <td>1.25</td>
+                                <td>+25% rate for 2-day access</td>
+                            </tr>
+                            <tr>
+                                <td><strong>3</strong></td>
+                                <td>50%</td>
+                                <td>1.50</td>
+                                <td>+50% rate for 3-day access</td>
+                            </tr>
+                            <tr>
+                                <td><strong>7</strong></td>
+                                <td>120%</td>
+                                <td>2.20</td>
+                                <td>+120% for full week</td>
+                            </tr>
+                            <tr>
+                                <td><strong>30</strong></td>
+                                <td>235%</td>
+                                <td>3.35</td>
+                                <td>+235% for monthly validity</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <h3>4.3 Interpolated VPM for Arbitrary Validity</h3>
+                <p>For validity durations not explicitly configured, the system performs <strong>linear interpolation</strong> between the nearest defined points:</p>
+                
+                <div class="example-box">
+                    <div class="example-label">WORKED EXAMPLE: 5-Day Validity</div>
+                    <p><strong>Given points:</strong> [(1, 0%), (3, 50%), (7, 120%)]</p>
+                    <p><strong>Finding interval:</strong> 5 falls between 3 and 7</p>
+                    <div class="formula-box">
+                        $$\begin{aligned}
+                        Premium(5) &= 50 + \frac{120 - 50}{7 - 3}(5 - 3) \\[8pt]
+                        &= 50 + \frac{70}{4} \times 2 \\[8pt]
+                        &= 50 + 35 = \mathbf{85\%}
+                        \end{aligned}$$
+                    </div>
+                    <p><strong>Result:</strong> $VPM(5) = 1 + 0.85 = \mathbf{1.85}$</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- Part 5: Discount Architecture -->
+        <section id="part5">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Part 5: Multiplicative Discount Architecture</h2>
+                </div>
+                
+                <p>The final effective rate incorporates <strong>three multiplicative discount factors</strong>, enabling flexible composition of various promotional and structural adjustments:</p>
+                
+                <div class="formula-box large">
+                    $ER_{final} = ER_{base} \times MBDF \times TDF$
+                </div>
+                
+                <div class="grid-2">
+                    <div class="card card-highlight">
+                        <h4>📦 MBDF — Mixed Bundle Discount Factor</h4>
+                        <p>Applies when customers purchase multiple services simultaneously:</p>
+                        <div class="formula-box">
+                            $MBDF = 1 - \frac{mbdf\_per \times BD(n)}{100}$
+                        </div>
+                        <p style="margin-top: 16px;">Where $BD(n)$ is the bundle discount percentage based on number of services $n$, and $mbdf\_per$ is a binary flag (0 or 1).</p>
+                    </div>
+                    
+                    <div class="card card-highlight">
+                        <h4>🏷️ TDF — Transaction Discount Factor</h4>
+                        <p>Captures channel-specific and campaign-specific pricing adjustments:</p>
+                        <div class="formula-box">
+                            $TDF = 1 - \frac{discount}{100}$
+                        </div>
+                        <p style="margin-top: 16px;">Varies by offer type: ATL, DIY mode, promotions, or BTL tiers.</p>
+                    </div>
+                </div>
+                
+                <h3>5.1 Bundle Discount Schedule</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Number of Services (n)</th>
+                                <th>Bundle Discount BD(n)</th>
+                                <th>Business Logic</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>1</strong></td>
+                                <td>0%</td>
+                                <td>No bundle benefit for single service</td>
+                            </tr>
+                            <tr>
+                                <td><strong>2</strong></td>
+                                <td>10%</td>
+                                <td>Moderate dual-service incentive</td>
+                            </tr>
+                            <tr>
+                                <td><strong>3</strong></td>
+                                <td>20%</td>
+                                <td>Strong triple-service incentive</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <h3>5.2 Identifying Eligible Services for Bundle Discount</h3>
+                <p>The system identifies which services receive the bundle discount through a <strong>ranking algorithm</strong>:</p>
+                
+                <div class="algorithm-box">
+                    <div class="algorithm-steps">
+                        <div class="algorithm-step">
+                            <strong>Collect Active Services</strong> — Filter services with positive allocation (> 0)
+                        </div>
+                        <div class="algorithm-step">
+                            <strong>Sort by Allocation Value</strong> — Order services ascending by their price/volume allocation
+                        </div>
+                        <div class="algorithm-step">
+                            <strong>Assign Flags</strong> — All services except the <em>largest</em> receive $mbdf\_per = 1$ (eligible for discount)
+                        </div>
+                    </div>
+                </div>
+                
+                <pre><code><span class="comment"># Sort services by their allocation amount (ascending)</span>
+sorted_keys = sorted(active_services, key=active_services.get)
+
+<span class="comment"># Mark all but the largest as "smallest" (discount eligible)</span>
+smallest_ser = {
+    k: (<span class="number">1</span> <span class="keyword">if</span> i < num_services - <span class="number">1</span> <span class="keyword">else</span> <span class="number">0</span>)
+    <span class="keyword">for</span> i, k <span class="keyword">in</span> enumerate(sorted_keys)
+}</code></pre>
+                
+                <h3>5.3 Transaction Discount Tiers</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Offer Type</th>
+                                <th>Discount %</th>
+                                <th>TDF Value</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>atl</strong></td>
+                                <td>0%</td>
+                                <td>1.00</td>
+                                <td>Above-The-Line (standard retail)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>diy_mode</strong></td>
+                                <td>-5%</td>
+                                <td>1.05</td>
+                                <td>DIY markup (customer designs own bundle)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>promotion_mode</strong></td>
+                                <td>35%*</td>
+                                <td>0.65</td>
+                                <td>Special campaign pricing (*varies by service)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>btl_normal</strong></td>
+                                <td>20%</td>
+                                <td>0.80</td>
+                                <td>Standard BTL discount</td>
+                            </tr>
+                            <tr>
+                                <td><strong>btl_moderate</strong></td>
+                                <td>30%</td>
+                                <td>0.70</td>
+                                <td>Moderate BTL discount</td>
+                            </tr>
+                            <tr>
+                                <td><strong>btl_aggressive</strong></td>
+                                <td>40%</td>
+                                <td>0.60</td>
+                                <td>Aggressive BTL discount</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- Part 6: Complete Algorithm -->
+        <section id="part6">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Part 6: Complete Volume Calculation Algorithm</h2>
+                </div>
+                
+                <p>We now synthesize all components into the complete algorithm that transforms a price input into a volume output.</p>
+                
+                <div class="algorithm-box">
+                    <h4 style="margin-bottom: 24px;">ALGORITHM: CalculateVolumeFromPrice</h4>
+                    
+                    <div class="algorithm-steps">
+                        <div class="algorithm-step">
+                            <strong>Compute MBDF</strong><br>
+                            <span style="color: var(--text-secondary); font-size: 0.95rem;">
+                                $MBDF = 1 - \frac{mbdf\_per \times BD(n)}{100}$
+                            </span>
+                        </div>
+                        
+                        <div class="algorithm-step">
+                            <strong>Compute TDF</strong><br>
+                            <span style="color: var(--text-secondary); font-size: 0.95rem;">
+                                If promotion conditions met: $TDF = 1 - \frac{promo\_discount}{100}$<br>
+                                Otherwise: $TDF = 1 - \frac{btl\_discount}{100}$
+                            </span>
+                        </div>
+                        
+                        <div class="algorithm-step">
+                            <strong>Compute Base Effective Rate</strong><br>
+                            <span style="color: var(--text-secondary); font-size: 0.95rem;">
+                                Select formula based on service type:<br>
+                                • Voice: Interpolation → Decay (with optional VPM)<br>
+                                • Data: Hybrid anchor-based selection<br>
+                                • SMS: Pure exponential decay
+                            </span>
+                        </div>
+                        
+                        <div class="algorithm-step">
+                            <strong>Apply Validity Premium</strong><br>
+                            <span style="color: var(--text-secondary); font-size: 0.95rem;">
+                                $ER_{base} = ER_{raw} \times VPM(validity\_days)$
+                            </span>
+                        </div>
+                        
+                        <div class="algorithm-step">
+                            <strong>Apply Discount Factors</strong><br>
+                            <span style="color: var(--text-secondary); font-size: 0.95rem;">
+                                $ER_{final} = ER_{base} \times MBDF \times TDF$
+                            </span>
+                        </div>
+                        
+                        <div class="algorithm-step">
+                            <strong>Compute Final Volume</strong><br>
+                            <span style="color: var(--text-secondary); font-size: 0.95rem;">
+                                $V = \frac{P}{ER_{final}}$
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <h3>6.1 Worked Example: Voice Purchase</h3>
+                <div class="example-box">
+                    <div class="example-label">SCENARIO</div>
+                    <p><strong>Price:</strong> ₹500 | <strong>Service:</strong> Voice | <strong>Validity:</strong> 3 days | <strong>Mode:</strong> Single service, BTL Normal</p>
+                    
+                    <hr style="border: none; border-top: 1px solid var(--border-color); margin: 20px 0;">
+                    
+                    <h4 style="color: var(--text-primary);">Step-by-Step Calculation:</h4>
+                    
+                    <p><strong>Step 1 — MBDF:</strong> $1.0$ (single service, no bundle discount)</p>
+                    
+                    <p><strong>Step 2 — TDF:</strong> $1 - 20/100 = \mathbf{0.80}$ (btl_normal)</p>
+                    
+                    <p><strong>Step 3 — Base ER (Interpolation):</strong></p>
+                    <ul style="margin-left: 20px;">
+                        <li>Price 500 falls between [450, ₹8.82/min] and [540, ₹8.44/min]</li>
+                        <li>$ER = 8.82 + \frac{8.44 - 8.82}{540 - 450}(500 - 450)$</li>
+                        <li>$ER = 8.82 + (-0.00422)(50) = 8.82 - 0.211 = \mathbf{8.609}$</li>
+                    </ul>
+                    
+                    <p><strong>Step 4 — Apply VPM:</strong> $VPM(3\text{ days}) = 1.50$</p>
+                    <p>$ER_{base} = 8.609 \times 1.50 = \mathbf{12.914}$</p>
+                    
+                    <p><strong>Step 5 — Final ER:</strong> $12.914 \times 1.0 \times 0.80 = \mathbf{10.331}$</p>
+                    
+                    <p><strong>Step 6 — Volume:</strong> $V = 500 / 10.331 = \mathbf{48.4 \approx 48 \text{ minutes}}$</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- Part 7: Inverse Problem -->
+        <section id="part7">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Part 7: The Inverse Problem — Binary Search</h2>
+                </div>
+                
+                <h3>7.1 Problem Formulation</h3>
+                <p>In many scenarios (particularly "build your bundle" interfaces), we need to solve the <strong>inverse problem</strong>: given a target volume $V^*$, find the price $P^*$ such that:</p>
+                
+                <div class="formula-box large">
+                    $\text{CalculateVolume}(P^*) = V^*$
+                </div>
+                
+                <p>Since our pricing function is <strong>non-analytic</strong> (piecewise-defined with conditional logic), we cannot derive a closed-form inverse. Instead, we employ <strong>binary search</strong> (bisection method).</p>
+                
+                <h3>7.2 Binary Search Algorithm</h3>
+                <div class="algorithm-box">
+                    <h4 style="margin-bottom: 24px;">ALGORITHM: FindPriceForVolume</h4>
+                    
+                    <div class="algorithm-steps">
+                        <div class="algorithm-step">
+                            <strong>Initialize Bounds</strong><br>
+                            <span style="color: var(--text-secondary); font-size: 0.95rem;">
+                                $low = 0.01$, $high = P_{max}$
+                            </span>
+                        </div>
+                        
+                        <div class="algorithm-step">
+                            <strong>Iterate (up to 100 iterations)</strong><br>
+                            <span style="color: var(--text-secondary); font-size: 0.95rem;">
+                                $guess = \frac{low + high}{2}$<br>
+                                $volume = \text{CalculateVolume}(guess)$<br>
+                                Apply rounding rules to volume
+                            </span>
+                        </div>
+                        
+                        <div class="algorithm-step">
+                            <strong>Update Bounds</strong><br>
+                            <span style="color: var(--text-secondary); font-size: 0.95rem;">
+                                If $rounded\_volume < V^*$: $low = guess$ (need higher price)<br>
+                                Else: $high = guess$ (need lower price)
+                            </span>
+                        </div>
+                        
+                        <div class="algorithm-step">
+                            <strong>Convergence Check</strong><br>
+                            <span style="color: var(--text-secondary); font-size: 0.95rem;">
+                                If $(high - low) < 0.001$: BREAK<br>
+                                Return $high$ as final price
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <h3>7.3 Convergence Analysis</h3>
+                <div class="card">
+                    <p>Binary search on interval $[0.01, P_{max}]$ with tolerance $\epsilon = 0.001$:</p>
+                    <div class="formula-box">
+                        $$\begin{aligned}
+                        \text{Iterations Required} &= \left\lceil \log_2\left(\frac{P_{max} - 0.01}{\epsilon}\right)\right\rceil \\[10pt]
+                        &= \left\lceil \log_2\left(\frac{9999.99}{0.001}\right)\right\rceil \\[10pt]
+                        &= \lceil \log_2(9,999,990) \rceil \approx \mathbf{24 \text{ iterations}}
+                        \end{aligned}$$
+                    </div>
+                    <p style="margin-top: 16px;">The algorithm allocates <strong>100 iterations</strong> as an upper bound — more than sufficient for convergence while maintaining computational efficiency.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- Part 8: Configuration Parameters -->
+        <section id="part8">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Part 8: Configuration Parameters Deep-Dive</h2>
+                </div>
+                
+                <h3>8.1 Voice Service Configuration</h3>
+                <div class="grid-2">
+                    <div class="card">
+                        <h4>Core Parameters</h4>
+                        <div class="table-wrapper">
+                            <table>
+                                <tr><td><strong>anchor_price</strong></td><td>₹200</td></tr>
+                                <tr><td><strong>anchor_rate</strong></td><td>₹13.3/min</td></tr>
+                                <tr><td><strong>floor_rate</strong></td><td>₹6.0/min</td></tr>
+                                <tr><td><strong>max_price</strong></td><td>₹10,000</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h4>Decay Constant Computation</h4>
+                        <div class="formula-box">
+                            $$\begin{aligned}
+                            k &= -\frac{\ln\left(\frac{6.01}{13.3 - 6.0}\right)}{10000 - 200} \\[8pt]
+                            &= -\frac{\ln(0.8233)}{9800} \\[8pt]
+                            &= \frac{0.1946}{9800} \\[8pt]
+                            &\approx \mathbf{1.986 \times 10^{-5}}
+                            \end{aligned}$$
+                        </div>
+                    </div>
+                </div>
+                
+                <h3>8.2 Data Service Configuration</h3>
+                <div class="card">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Value</th>
+                                    <th>Interpretation</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><strong>anchor_price</strong></td><td>₹650</td><td>Transition point for hybrid model</td></tr>
+                                <tr><td><strong>anchor_rate</strong></td><td>₹0.42/MB</td><td>Rate at anchor price</td></tr>
+                                <tr><td><strong>floor_rate</strong></td><td>₹0.20/MB</td><td>Asymptotic minimum</td></tr>
+                                <tr><td><strong>max_price</strong></td><td>₹10,000</td><td>Upper bound</td></tr>
+                                <tr><td><strong>Rounding</strong></td><td>Nearest 5 MB</td><td>Ceiling function applied</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <h3>8.3 Empirical Price Points — Voice Daily</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Price (₹)</th>
+                                <th>Rate (₹/min)</th>
+                                <th>Marginal Change</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>100</td><td>20.00</td><td>—</td></tr>
+                            <tr><td>150</td><td>16.67</td><td>-16.7%</td></tr>
+                            <tr><td>200</td><td>12.50</td><td>-25.0%</td></tr>
+                            <tr><td>300</td><td>10.71</td><td>-14.3%</td></tr>
+                            <tr><td>450</td><td>8.82</td><td>-17.6%</td></tr>
+                            <tr><td>540</td><td>8.44</td><td>-4.3%</td></tr>
+                            <tr><td>750</td><td>7.14</td><td>-15.4%</td></tr>
+                            <tr><td>800</td><td>6.67</td><td>-6.6%</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- Part 9: Mathematical Properties -->
+        <section id="part9">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Part 9: Mathematical Properties & Proofs</h2>
+                </div>
+                
+                <h3>9.1 Monotonicity Theorem</h3>
+                <div class="card card-highlight">
+                    <h4>Theorem: $V(P)$ is Strictly Monotonically Increasing</h4>
+                    <p><strong>Proof:</strong></p>
+                    <ol style="margin-left: 20px; margin-top: 16px;">
+                        <li>$ER(P)$ is strictly <strong>decreasing</strong> (exponential decay with negative exponent, or decreasing linear interpolation)</li>
+                        <li>$V(P) = P / ER(P)$</li>
+                        <li>Differentiating: $\displaystyle\frac{dV}{dP} = \frac{ER - P \cdot ER'}{ER^2}$</li>
+                        <li>Since $ER' < 0$ (decreasing function) and $ER > 0$ always:</li>
+                        <li>Numerator: $ER - P \cdot ER' > ER > 0$ ✓</li>
+                        <li>Denominator: $ER^2 > 0$ ✓</li>
+                        <li>Therefore: $\frac{dV}{dP} > 0$ everywhere</li>
+                    </ol>
+                    <p style="margin-top: 16px;"><strong>Corollary:</strong> Binary search is guaranteed to converge to unique solution.</p>
+                </div>
+                
+                <h3>9.2 Continuity Analysis</h3>
+                <div class="card">
+                    <p>The composite function $V(P)$ is <strong>continuous</strong> at all transition points:</p>
+                    <ul>
+                        <li><strong>Interpolation → Decay boundary:</strong> Both formulas evaluate to identical values at the junction point by construction</li>
+                        <li><strong>Validity transitions:</strong> VPM provides continuous scaling without discontinuities</li>
+                        <li><strong>Discount application:</strong> Multiplicative factors preserve continuity</li>
+                    </ul>
+                </div>
+                
+                <h3>9.3 Concavity Property</h3>
+                <div class="card">
+                    <p>$V(P)$ is <strong>concave</strong> (exhibiting diminishing returns):</p>
+                    <ul>
+                        <li>Each additional rupee yields <strong>fewer additional units</strong> than the previous rupee</li>
+                        <li>This aligns with standard economic intuition for bulk discounting</li>
+                        <li>Mathematically: $\frac{d^2V}{dP^2} < 0$ for typical parameter ranges</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- Part 10: Edge Cases -->
+        <section id="part10">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Part 10: Edge Cases & Business Rules</h2>
+                </div>
+                
+                <div class="grid-2">
+                    <div class="card">
+                        <h4>📐 Rounding Rules</h4>
+                        <p><strong>Data Service:</strong></p>
+                        <p>Round UP to nearest 5 MB (ceiling function):</p>
+                        <div class="formula-box">
+                            $rounded = \lceil \frac{units}{5} \rceil \times 5$
+                        </div>
+                        <p style="margin-top: 12px;"><strong>Voice/SMS:</strong> Standard rounding to nearest integer unit.</p>
+                    </div>
+                    
+                    <div class="card">
+                        <h4>⚠️ Minimum Constraints</h4>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Constraint</th>
+                                        <th>Voice</th>
+                                        <th>Data</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>Min Price</td><td>₹100</td><td>₹100</td></tr>
+                                    <tr><td>Min Vol (Single)</td><td>5 min</td><td>50 MB</td></tr>
+                                    <tr><td>Min Vol (Bundle)</td><td>5 min</td><td>50 MB</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <h3>10.1 Special Operating Modes</h3>
+                <div class="grid-2">
+                    <div class="card card-highlight">
+                        <h4>🛠️ DIY Mode (Do-It-Yourself)</h4>
+                        <p><strong>Discount: -5%</strong> (negative = markup!)</p>
+                        <p>When customers design their own custom bundles, the system applies a <strong>5% premium</strong> over base pricing. This reflects the increased operational complexity and positions pre-configured packages as better value.</p>
+                        <div class="formula-box">
+                            $TDF_{diy} = 1 - \frac{-5}{100} = \mathbf{1.05}$
+                        </div>
+                    </div>
+                    
+                    <div class="card card-highlight">
+                        <h4>🎯 Promotion Mode</h4>
+                        <p>Promotional pricing with <strong>conditional activation</strong>:</p>
+                        <ul style="margin-top: 12px;">
+                            <li>Only applies within specified price range $[P_{start}, P_{end}]$</li>
+                            <li>Can be restricted to specific validity periods</li>
+                            <li>Service-specific discount rates (35% for voice)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- Part 11: Examples -->
+        <section id="part11">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Part 11: Comprehensive Numerical Examples</h2>
+                </div>
+                
+                <h3>Example 1: Simple Voice Purchase</h3>
+                <div class="example-box">
+                    <div class="example-label">INPUT PARAMETERS</div>
+                    <p><strong>Price:</strong> ₹300 | <strong>Service:</strong> Voice | <strong>Validity:</strong> 1 day | <strong>Services:</strong> 1 | <strong>Mode:</strong> ATL</p>
+                    
+                    <hr style="border: none; border-top: 1px solid var(--border-color); margin: 20px 0;">
+                    
+                    <p><strong>Step 1:</strong> MBDF = 1.0 (single service)</p>
+                    <p><strong>Step 2:</strong> TDF = 1.0 (ATL = 0% discount)</p>
+                    <p><strong>Step 3:</strong> Base ER via interpolation between [230, 12.11] and [300, 10.71]:</p>
+                    <div class="formula-box">$ER = 12.11 + \frac{10.71 - 12.11}{300 - 230}(300 - 230) = 12.11 - 1.4 = \mathbf{10.71}$</div>
+                    <p><strong>Step 4:</strong> VPM(1 day) = 1.0 → $ER_{base} = 10.71$</p>
+                    <p><strong>Step 5:</strong> $ER_{final} = 10.71 \times 1.0 \times 1.0 = \mathbf{10.71}$</p>
+                    <p><strong>Result:</strong> $V = 300 / 10.71 = \mathbf{28.0 \text{ minutes}}$</p>
+                </div>
+                
+                <h3>Example 2: Data with Aggressive BTL Discount</h3>
+                <div class="example-box">
+                    <div class="example-label">INPUT PARAMETERS</div>
+                    <p><strong>Price:</strong> ₹1000 | <strong>Service:</strong> Data | <strong>Validity:</strong> 7 days | <strong>Mode:</strong> BTL Aggressive</p>
+                    
+                    <hr style="border: none; border-top: 1px solid var(--border-color); margin: 20px 0;">
+                    
+                    <p><strong>Step 1:</strong> MBDF = 1.0</p>
+                    <p><strong>Step 2:</strong> TDF = 1 - 40/100 = <strong>0.60</strong></p>
+                    <p><strong>Step 3:</strong> Price (₹1000) > Anchor (₹650) → Use exponential decay:</p>
+                    <div class="formula-box">$ER = 0.2 + (0.42 - 0.2) \times e^{-k(1000-650)} = 0.2 + 0.22 \times e^{-0.189} = \mathbf{0.382}$</div>
+                    <p><strong>Step 4:</strong> VPM(7 days) = 2.2 → $ER_{base} = 0.382 \times 2.2 = \mathbf{0.840}$</p>
+                    <p><strong>Step 5:</strong> $ER_{final} = 0.840 \times 0.60 = \mathbf{0.504}$</p>
+                    <p><strong>Step 6:</strong> $V = 1000 / 0.504 = 1984$ MB</p>
+                    <p><strong>Step 7:</strong> Rounded: $\lceil 1984/5 \rceil \times 5 = \mathbf{1985 \text{ MB}}$</p>
+                </div>
+                
+                <h3>Example 3: Multi-Service Bundle</h3>
+                <div class="example-box">
+                    <div class="example-label">INPUT PARAMETERS</div>
+                    <p><strong>Allocation:</strong> Voice ₹200 + Data ₹300 | <strong>Validity:</strong> 30 days | <strong>Mode:</strong> BTL Moderate</p>
+                    
+                    <hr style="border: none; border-top: 1px solid var(--border-color); margin: 20px 0;">
+                    
+                    <h4 style="color: var(--accent-cyan);">Service Identification:</h4>
+                    <p>Active: {voice: ₹200, data: ₹300}<br>
+                    Sorted by price: [voice (₹200), data (₹300)]<br>
+                    Smallest flags: {voice: 1, data: 0}</p>
+                    
+                    <h4 style="color: var(--accent-cyan); margin-top: 20px;">Voice Calculation:</h4>
+                    <p>• MBDF = 1 - (1 × 10/100) = <strong>0.90</strong> (smallest service gets discount)<br>
+                    • TDF = 1 - 30/100 = <strong>0.70</strong><br>
+                    • Base ER ≈ 13.3 (at anchor), VPM(30) = 3.35<br>
+                    • $ER_{base} = 13.3 \times 3.35 = 44.56$<br>
+                    • $ER_{final} = 44.56 \times 0.90 \times 0.70 = 28.07$<br>
+                    • $Volume = 200 / 28.07 = 7.1 \approx \mathbf{7 \text{ minutes}}$</p>
+                    
+                    <h4 style="color: var(--accent-cyan); margin-top: 20px;">Data Calculation:</h4>
+                    <p>• MBDF = 1.0 (largest service, no bundle discount)<br>
+                    • TDF = 0.70<br>
+                    • Base ER: Interpolate(300, daily_points) ≈ 1.294, VPM(30) = 3.35<br>
+                    • $ER_{base} = 1.294 \times 3.35 = 4.33$<br>
+                    • $ER_{final} = 4.33 \times 1.0 \times 0.70 = 3.03$<br>
+                    • $Volume = 300 / 3.03 = 99$ MB → Rounded: <strong>100 MB</strong></p>
+                    
+                    <hr style="border: none; border-top: 1px solid var(--border-color); margin: 20px 0;">
+                    
+                    <p><strong>Final Bundle Output:</strong> <code>{voice: "7 Minutes", data: "100 MB"}</code></p>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- Part 12: Architecture -->
+        <section id="part12">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Part 12: System Architecture</h2>
+                </div>
+                
+                <h3>12.1 Class Hierarchy</h3>
+                <div class="card">
+                    <pre style="background: transparent; border: none; padding: 0; font-size: 0.9rem;"><code style="color: var(--text-secondary);">
+<span style="color: var(--accent-blue);">┌─────────────────────────────────────────┐</span>
+<span style="color: var(--accent-blue);">│</span>           PRICING_CONFIG              <span style="color: var(--accent-blue);">│</span>
+<span style="color: var(--accent-blue);">│</span>    (Immutable Configuration Dictionary)  <span style="color: var(--accent-blue);">│</span>
+<span style="color: var(--accent-blue);">└──────────────────┬──────────────────────┘</span>
+                   <span style="color: var(--text-secondary);">│</span>
+                   <span style="color: var(--text-secondary);">▼</span>
+<span style="color: var(--accent-purple);">┌─────────────────────────────────────────┐</span>
+<span style="color: var(--accent-purple);">│</span>             PricingMath               <span style="color: var(--accent-purple);">│</span>
+<span style="color: var(--accent-purple);">│</span>  ───────────────────────────────     <span style="color: var(--accent-purple);">│</span>
+<span style="color: var(--accent-purple);">│</span>  + recalculate_decay(...)            <span style="color: var(--accent-purple);">│</span>
+<span style="color: var(--accent-purple);">│</span>  + interpolate(x, points)            <span style="color: var(--accent-purple);">│</span>
+<span style="color: var(--accent-purple);">│</span>  + get_vpm(days, config)             <span style="color: var(--accent-purple);">│</span>
+<span style="color: var(--accent-purple);">│</span>  (Static Utility Class)               <span style="color: var(--accent-purple);">│</span>
+<span style="color: var(--accent-purple);">└──────────────────┬──────────────────────┘</span>
+                   <span style="color: var(--text-secondary);">│</span>
+                   <span style="color: var(--text-secondary);">▼</span>
+<span style="color: var(--accent-cyan);">┌─────────────────────────────────────────┐</span>
+<span style="color: var(--accent-cyan);">│</span>       DynamicPricingEngine            <span style="color: var(--accent-cyan);">│</span>
+<span style="color: var(--accent-cyan);">│</span>  ───────────────────────────────     <span style="color: var(--accent-cyan);">│</span>
+<span style="color: var(--accent-cyan);">│</span>  - config: Dict                       <span style="color: var(--accent-cyan);">│</span>
+<span style="color: var(--accent-cyan);">│</span>  ───────────────────────────────     <span style="color: var(--accent-cyan);">│</span>
+<span style="color: var(--accent-cyan);">│</span>  + calculate_volume_from_price()      <span style="color: var(--accent-cyan);">│</span>
+<span style="color: var(--accent-cyan);">│</span>  + calculate_bundle()                 <span style="color: var(--accent-cyan);">│</span>
+<span style="color: var(--accent-cyan);">│</span>  + find_price_for_volume()            <span style="color: var(--accent-cyan);">│</span>
+<span style="color: var(--accent-cyan);">│</span>  + calculate_price_from_volume()      <span style="color: var(--accent-cyan);">│</span>
+<span style="color: var(--accent-cyan);">└─────────────────────────────────────────┘</span></code></pre>
+                </div>
+                
+                <h3>12.2 Data Flow Pipeline</h3>
+                <div class="algorithm-box">
+                    <div class="algorithm-steps">
+                        <div class="algorithm-step">
+                            <strong>User Input</strong><br>
+                            <span style="color: var(--text-secondary);">Price OR Volume specification</span>
+                        </div>
+                        <div class="algorithm-step">
+                            <strong>Input Parser</strong><br>
+                            <span style="color: var(--text-secondary);">Validate and normalize parameters</span>
+                        </div>
+                        <div class="algorithm-step">
+                            <strong>Discount Calculator</strong><br>
+                            <span style="color: var(--text-secondary);">Compute MBDF and TDF factors</span>
+                        </div>
+                        <div class="algorithm-step">
+                            <strong>Base ER Engine</strong><br>
+                            <span style="color: var(--text-secondary);">Interpolation or Exponential Decay</span>
+                        </div>
+                        <div class="algorithm-step">
+                            <strong>VPM Applicator</strong><br>
+                            <span style="color: var(--text-secondary);">Apply validity period multiplier</span>
+                        </div>
+                        <div class="algorithm-step">
+                            <strong>Output Formatter</strong><br>
+                            <span style="color: var(--text-secondary);">Rounding, unit labeling, response assembly</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- Part 13: Research Directions -->
+        <section id="part13">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Part 13: Extensions & Research Directions</h2>
+                </div>
+                
+                <div class="grid-3">
+                    <div class="feature-item">
+                        <div class="feature-icon">🤖</div>
+                        <div class="feature-title">Machine Learning Integration</div>
+                        <div class="feature-desc">Learn decay parameters $k$ from historical transaction data. Enable personalized pricing through customer segmentation clustering.</div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">📈</div>
+                        <div class="feature-title">Revenue Optimization</div>
+                        <div class="feature-desc">Maximize revenue under capacity constraints using convex optimization. Incorporate price elasticity modeling.</div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">🎮</div>
+                        <div class="feature-title">Game Theory</div>
+                        <div class="feature-desc">Model competitive responses and market equilibrium states. Analyze multi-agent pricing dynamics.</div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">📊</div>
+                        <div class="feature-title">Gaussian Processes</div>
+                        <div class="feature-desc">Non-parametric rate curves with uncertainty quantification. Bayesian optimization for parameter tuning.</div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">🔄</div>
+                        <div class="feature-title">Reinforcement Learning</div>
+                        <div class="feature-desc">Adaptive pricing strategies that learn optimal policies through environment interaction.</div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">⏰</div>
+                        <div class="feature-title">Temporal Dynamics</div>
+                        <div class="feature-desc">Time-varying parameters based on seasonality, day-of-week patterns, and demand forecasting.</div>
+                    </div>
+                </div>
+                
+                <h3 style="margin-top: 48px;">Open Problems for Investigation</h3>
+                <div class="card">
+                    <ol>
+                        <li><strong>Revenue Optimality:</strong> Is the current piecewise-exponential structure revenue-optimal for monopolistic settings?</li>
+                        <li><strong>Arbitrage Detection:</strong> How to mathematically identify and prevent cross-segment arbitrage opportunities?</li>
+                        <li><strong>Parameter Sensitivity:</strong> What is the Lipschitz continuity of revenue with respect to parameter perturbations?</li>
+                        <li><strong>Convergence Rates:</strong> Can we develop faster-than-binary-search inversion algorithms exploiting function structure?</li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p><strong>Advanced Algorithms in Revenue Optimization</strong> — Stanford University</p>
+            <p style="margin-top: 12px;">Department of Mathematics & Artificial Intelligence Engineering</p>
+            <p style="margin-top: 24px; font-size: 0.85rem; opacity: 0.6;">© 2024 Stanford University — For Educational Purposes Only</p>
+            <p style="margin-top: 8px; font-size: 0.8rem; opacity: 0.5;">Office Hours: Mon/Wed 2-4 PM | Building 420, Room 047</p>
+        </div>
+    </footer>
+</body>
+</html>

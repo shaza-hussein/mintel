@@ -44,19 +44,22 @@ class PricingMath:
         x: float,
         points: Points
     ) -> float:
+        # Handle left boundary: extrapolate using initial slope
         if x < points[0][0]:
             x1, y1 = points[0]
             x2, y2 = points[1]
             slope = (y2 - y1) / (x2 - x1) if (x2 - x1) != 0 else 0
 
             return y1 + (x - x1) * slope
-
+        
+        # Find containing interval via linear scan
         for i in range(len(points) - 1):
             x1, y1 = points[i]
             x2, y2 = points[i + 1]
             if x1 <= x < x2:
                 return y1 + (x - x1) * (y2 - y1) / (x2 - x1)
-
+            
+        # Right boundary: return last known value
         return points[-1][1]
 
 

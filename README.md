@@ -186,6 +186,7 @@ The generation of new telecom products is handled by a dual-pathway architecture
 A custom machine learning regressor designed to predict market adoption. To handle the heavy-tailed distributions typical in telecom usage, all continuous components are transformed using logarithmic scaling followed by Min-Max Normalization. 
 
 The target variable (Popularity Score) is a scale-invariant metric weighted by direct commercial impact:
+
 $$Score = (0.50 \times Revenue) + (0.25 \times Users) + (0.25 \times Contribution)$$
 
 **Feature Engineering Space:**
@@ -203,15 +204,19 @@ A rigorous mathematical simulation tailored for telecom portfolios. It calculate
 
 **Step 1: Dynamic Maximum Normalization**
 Normalizes raw features to a $[0, 1]$ scale. If a newly generated bundle exceeds the portfolio's historical maximum (e.g., an unprecedented data volume), the boundary is dynamically raised to maintain relative contextual comparisons:
+
 $$\hat{x}_{new} = \frac{x_{new}}{\max(X_{exist} \cup \{x_{new}\})}$$
 
 **Step 2: Weighted Cosine Similarity**
 Computes the structural overlap between new and existing bundles. A Cross-Type Penalty is applied to prevent mathematically sound but logically flawed cannibalization (e.g., preventing a data-only bundle from severely cannibalizing a voice-only bundle).
+
 $$Sim(A, B) = \frac{\sum (w_k \cdot \hat{A}_k \cdot \hat{B}_k)}{\sqrt{\sum (w_k \cdot \hat{A}_k^2)} \sqrt{\sum (w_k \cdot \hat{B}_k^2)}}$$
+
 *(Where $w_k$ represents the business weight assigned to feature $k$).*
 
 **Step 3: Logit-Style Utility**
 Calculates the economic attractiveness ("Value for Money") of a bundle, factoring in the predicted popularity ($P$) and price elasticity ($\epsilon$):
+
 $$Utility = \frac{e^{\epsilon \cdot P}}{Price + 0.01}$$
 
 **Step 4: Cannibalization Rate Calculation**
